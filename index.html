@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
-    <!-- Meta tags PWA -->
+    <!-- Meta tags PWA Légère (Garanti sans blocage de cache) -->
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0056b3">
     <link rel="apple-touch-icon" href="icon-192.png">
@@ -333,7 +333,6 @@
     }
 
     function suggestCode(inp) {
-        // Désactiver la validation si l'utilisateur saisit manuellement
         inp.setAttribute('data-valid', 'false');
         
         const val = (inp.value || '').toLowerCase().trim();
@@ -357,7 +356,6 @@
                 inp.setAttribute('data-code', m.code);
                 inp.setAttribute('data-quota', m.quota);
                 inp.setAttribute('data-prix', m.prix);
-                // Valider la saisie car elle provient de la liste
                 inp.setAttribute('data-valid', 'true');
                 suggestionsDiv.innerHTML = '';
                 
@@ -426,7 +424,6 @@
             const real = parseFloat(row.querySelector('.act-real').value);
             const isValid = inp.getAttribute('data-valid') === 'true';
 
-            // Contrôle strict : l'activité doit être sélectionnée dans la liste
             if (codeTxt || (!isNaN(real) && real > 0)) {
                 if (!isValid) {
                     alert(`Erreur : L'activité "${codeTxt}" n'est pas valide. Vous devez obligatoirement la sélectionner dans la liste déroulante proposée.`);
@@ -447,7 +444,7 @@
             }
         });
 
-        if (erreurValidation) return; // Stoppe l'enregistrement
+        if (erreurValidation) return;
         if (elements.length === 0) return alert("Renseignez au moins une tâche valide avec une quantité.");
 
         const stats = toutTachesDuJourOuvrier(ouvrier, date);
@@ -489,34 +486,28 @@
         rafraichirIndicateurSync();
     }
 
-    // Éditer la saisie depuis le rapport
     function editerSaisieOuvrier(date, ouvrier) {
         if(!confirm(`Voulez-vous modifier les activités de ${ouvrier} pour le ${date} ? Cela les rechargera dans l'onglet de saisie.`)) return;
 
-        // 1. Basculer sur l'onglet de saisie
         switchTab('tab2', document.getElementById('btn-tab-saisie'));
         
         document.getElementById('input-saisie-date').value = date;
         document.getElementById('select-ouvrier').value = ouvrier;
         
-        // 2. Charger les anciennes données
         const anciennesSaisies = appState.saisies.filter(s => s.dateTravail === date && s.nomOuvrier === ouvrier);
         const rows = document.querySelectorAll('.activity-row');
         
-        // Vider les lignes d'abord
         rows.forEach(r => {
             r.querySelector('.act-code').value = '';
             r.querySelector('.act-real').value = '';
             r.querySelector('.act-code').setAttribute('data-valid', 'false');
         });
         
-        // Remplir avec les données trouvées (jusqu'à 3 max)
         for(let i=0; i<Math.min(anciennesSaisies.length, rows.length); i++) {
             const row = rows[i];
             const data = anciennesSaisies[i];
             const inputCode = row.querySelector('.act-code');
             
-            // Rechercher le quota et prix de la tâche dans le référentiel pour recréer l'état
             const tacheRef = appState.taches.find(t => `${t.code} - ${t.desc}` === data.tache);
             
             inputCode.value = data.tache;
@@ -528,7 +519,6 @@
             row.querySelector('.act-real').value = data.quantite;
         }
 
-        // 3. Supprimer les anciennes saisies de l'état (puisqu'elles sont en cours de réédition)
         appState.saisies = appState.saisies.filter(s => !(s.dateTravail === date && s.nomOuvrier === ouvrier));
         localStorage.setItem('saisies_hors_ligne', JSON.stringify(appState.saisies));
         
@@ -591,14 +581,13 @@
 
         try {
             const payload = JSON.stringify(aSync);
-            const res = await fetch(SCRIPT_URL, {
+            await fetch(SCRIPT_URL, {
                 method: "POST",
                 mode: "no-cors",
                 headers: { "Content-Type": "application/json" },
                 body: payload
             });
 
-            // En no-cors, on suppose succès si pas d'erreur
             appState.saisies.forEach(s => s.synced = true);
             localStorage.setItem('saisies_hors_ligne', JSON.stringify(appState.saisies));
             updateSyncBadge("☁️ Connecté (À jour)", "var(--success-green)");
@@ -654,15 +643,6 @@
 
     window.addEventListener('online', () => chargerReferentiels());
     window.addEventListener('offline', () => updateSyncBadge("☁️ Hors-ligne", "var(--warning-orange)"));
-
-    // Enregistrement du Service Worker PWA
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-            navigator.serviceWorker.register('./sw.js')
-                .then(reg => console.log('PWA Service Worker enregistré avec succès:', reg.scope))
-                .catch(err => console.error('Échec enregistrement PWA:', err));
-        });
-    }
 </script>
 
 </body>
