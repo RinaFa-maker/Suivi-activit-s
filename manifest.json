@@ -1,0 +1,21 @@
+{
+  "short_name": "CanopyApp",
+  "name": "Canopy Energy - Suivi d'Activités",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": "./Suivi%20activit%C3%A9s%20journali%C3%A8res%20VF%20-%20Copie.html",
+  "background_color": "#0056b3",
+  "theme_color": "#0056b3",
+  "display": "standalone",
+  "orientation": "portrait"
+}

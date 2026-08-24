@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Meta tags PWA -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0056b3">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    
+    <title>Canopy Energy</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        :root {
+            --primary-blue: #0056b3;
+            --secondary-blue: #e6f2ff;
+            --dark-blue: #003366;
+            --text-color: #2b2b2b;
+            --border-color: #cccccc;
+            --success-green: #28a745;
+            --warning-orange: #ffc107;
+            --danger-red: #dc3545;
+        }
+
+        body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 0; background-color: #f4f7f6; color: var(--text-color); }
+        header { background-color: var(--primary-blue); color: white; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .brand-title { font-size: 1.4rem; font-weight: 700; letter-spacing: 0.5px; }
+        .sync-badge { font-size: 0.85rem; padding: 6px 12px; border-radius: 20px; background: rgba(255,255,255,0.2); font-weight: 600; }
+        .global-bar { background-color: var(--dark-blue); color: white; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+        .global-bar select { padding: 6px 12px; border-radius: 4px; border: none; font-weight: bold; }
+        .container { max-width: 950px; margin: 20px auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+        .tabs { display: flex; border-bottom: 2px solid var(--primary-blue); margin-bottom: 20px; overflow-x: auto; }
+        .tab-btn { background: transparent; border: none; padding: 12px 20px; cursor: pointer; font-size: 0.95rem; font-weight: 600; color: var(--text-color); white-space: nowrap; }
+        .tab-btn.active { background-color: var(--primary-blue); color: white; border-radius: 4px 4px 0 0; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 0.9rem; }
+        input, select { width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 4px; box-sizing: border-box; font-size: 0.95rem; }
+        .activity-row { display: flex; gap: 10px; margin-bottom: 12px; align-items: flex-start; }
+        .relative-wrapper { position: relative; flex: 2; }
+        
+        .autocomplete-suggestions { border: 1px solid var(--border-color); background: #fff; max-height: 200px; overflow-y: auto; position: absolute; width: 100%; z-index: 1000; box-shadow: 0 4px 8px rgba(0,0,0,0.15); border-radius: 0 0 4px 4px; }
+        .autocomplete-suggestion { padding: 10px 12px; cursor: pointer; font-size: 0.9rem; border-bottom: 1px solid #eee; }
+        .autocomplete-suggestion:hover { background-color: var(--secondary-blue); color: var(--dark-blue); font-weight: bold; }
+        .suggestion-hint { font-size: 0.8rem; color: #666; margin-top: 4px; }
+        .status-banner { padding: 12px; border-radius: 4px; background-color: var(--secondary-blue); border-left: 4px solid var(--primary-blue); margin-bottom: 15px; font-size: 0.95rem; }
+        
+        button { background-color: var(--primary-blue); color: white; border: none; padding: 10px 18px; border-radius: 4px; cursor: pointer; font-size: 0.95rem; font-weight: 600; }
+        button.success { background-color: var(--success-green); }
+        button.warning { background-color: var(--warning-orange); color: #000; }
+        
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        table, th, td { border: 1px solid var(--border-color); }
+        th, td { padding: 10px; text-align: left; font-size: 0.9rem; }
+        th { background-color: var(--secondary-blue); color: var(--dark-blue); }
+        #capture-container { position: absolute; left: -9999px; top: 0; width: 850px; background: white; padding: 30px; }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="brand-title">Canopy Energy</div>
+    <div id="sync-status" class="sync-badge">☁️ Hors-ligne</div>
+</header>
+
+<div class="global-bar">
+    <div>
+        <label style="display:inline; color:white; margin-right:8px;">Chef d'équipe :</label>
+        <select id="select-global-chef" onchange="onChefChange()"></select>
+    </div>
+    <div id="date-display" style="font-weight: bold;"></div>
+</div>
+
+<div class="container">
+    <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('tab1', this)">Référentiel</button>
+        <button class="tab-btn" id="btn-tab-saisie" onclick="switchTab('tab2', this)">Saisie Activités</button>
+        <button class="tab-btn" onclick="switchTab('tab3', this)">Rapports</button>
+        <button class="tab-btn" onclick="switchTab('tab4', this)">Synchronisation</button>
+    </div>
+
+    <div id="tab1" class="tab-content active">
+        <h2>Recherche des Tâches</h2>
+        <div class="form-group relative-wrapper">
+            <input type="text" id="search-code" class="act-code" oninput="suggestCode(this)" onfocus="suggestCode(this)" placeholder="Ex: Désherbage, code...">
+            <div class="autocomplete-suggestions"></div>
+        </div>
+        <div id="consultation-result" style="margin-top:20px; font-weight:bold; color:var(--primary-blue);"></div>
+    </div>
+
+    <div id="tab2" class="tab-content">
+        <h2>Enregistrement Journalier</h2>
+        
+        <div class="form-group" style="background:#f8f9fa; padding:12px; border-radius:4px;">
+            <label>Date :</label>
+            <input type="date" id="input-saisie-date" onchange="onOuvrierOrDateChange()">
+        </div>
+
+        <div class="form-group">
+            <label>Ouvrier :</label>
+            <select id="select-ouvrier" onchange="onOuvrierOrDateChange()"></select>
+        </div>
+
+        <div id="worker-status-banner" class="status-banner">Sélectionnez un ouvrier.</div>
+
+        <h3>Activités (Limite stricte : 2 unités sur 3 tâches max)</h3>
+        
+        <div id="activities-container">
+            <!-- Activité 1 -->
+            <div class="activity-row">
+                <div class="relative-wrapper">
+                    <label>Tâche 1</label>
+                    <input type="text" class="act-code" data-valid="false" placeholder="Choisir la tâche..." oninput="suggestCode(this)" onfocus="suggestCode(this)">
+                    <div class="autocomplete-suggestions"></div>
+                </div>
+                <div style="flex: 1;">
+                    <label>Quantité</label>
+                    <input type="number" class="act-real" min="0" step="any" placeholder="0" oninput="recalculerLignes()">
+                    <div class="suggestion-hint"></div>
+                </div>
+            </div>
+            <!-- Activité 2 -->
+            <div class="activity-row">
+                <div class="relative-wrapper">
+                    <label>Tâche 2</label>
+                    <input type="text" class="act-code" data-valid="false" placeholder="Choisir la tâche..." oninput="suggestCode(this)" onfocus="suggestCode(this)">
+                    <div class="autocomplete-suggestions"></div>
+                </div>
+                <div style="flex: 1;">
+                    <label>Quantité</label>
+                    <input type="number" class="act-real" min="0" step="any" placeholder="0" oninput="recalculerLignes()">
+                    <div class="suggestion-hint"></div>
+                </div>
+            </div>
+            <!-- Activité 3 -->
+            <div class="activity-row">
+                <div class="relative-wrapper">
+                    <label>Tâche 3</label>
+                    <input type="text" class="act-code" data-valid="false" placeholder="Choisir la tâche..." oninput="suggestCode(this)" onfocus="suggestCode(this)">
+                    <div class="autocomplete-suggestions"></div>
+                </div>
+                <div style="flex: 1;">
+                    <label>Quantité</label>
+                    <input type="number" class="act-real" min="0" step="any" placeholder="0" oninput="recalculerLignes()">
+                    <div class="suggestion-hint"></div>
+                </div>
+            </div>
+        </div>
+
+        <button onclick="enregistrerSaisie()" class="success" style="width:100%; margin-top:15px;">💾 Valider et Enregistrer</button>
+    </div>
+
+    <div id="tab3" class="tab-content">
+        <h2>Rapport de Synthèse Jour</h2>
+        <div class="form-group" style="max-width:250px;">
+            <input type="date" id="report-date" onchange="rafraichirRapports()">
+        </div>
+
+        <h3>1. Synthèse des volumes globaux</h3>
+        <table id="table-global-taches">
+            <thead>
+                <tr>
+                    <th>Code / Tâche</th>
+                    <th>Quantité Cumulée</th>
+                    <th>Équivalent Tâches (Unités)</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+
+        <h3 style="margin-top:25px;">2. Détail Financier et Opérationnel</h3>
+        <table id="table-detail-ouvriers">
+            <thead>
+                <tr>
+                    <th>Chef d'équipe</th>
+                    <th>Ouvrier</th>
+                    <th>Activités (Volumes)</th>
+                    <th>Tâches (Unités)</th>
+                    <th>Montant (Ar)</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+
+        <button onclick="capturerRapport()" class="warning" style="margin-top:20px;">📷 Exporter le Rapport en Image</button>
+    </div>
+
+    <div id="tab4" class="tab-content">
+        <h2>Transfert des Données</h2>
+        <div class="status-banner" id="sync-summary-banner">
+            Enregistrements en attente d'envoi : <strong>0</strong>
+        </div>
+
+        <button onclick="synchroniserDonnees()" style="width:100%; margin-bottom:12px;">🔄 Transmettre vers Google Sheets</button>
+        <button onclick="chargerReferentiels()" class="success" style="width:100%;">⬇️ Actualiser la Base de données (Ouvriers & Tâches)</button>
+    </div>
+</div>
+
+<div id="capture-container"></div>
+
+<script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby3to942EW3_6UaNO76a1b0LNDrTQaSRQCFhZYBewolTslE54KzIQQAwTvLVvnzZkIi-g/exec";
+    const MAX_TACHES_JOUR = 2; 
+    
+    let appState = {
+        taches: [],
+        ouvriers: [],
+        saisies: [],
+        activeChef: ""
+    };
+
+    window.onload = async () => {
+        const todayStr = new Date().toISOString().split('T')[0];
+        document.getElementById('input-saisie-date').value = todayStr;
+        document.getElementById('report-date').value = todayStr;
+        
+        document.getElementById('date-display').innerText = new Date().toLocaleDateString('fr-FR', {
+            weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+        });
+
+        chargerStockageLocal();
+        await chargerReferentiels();
+        initialiserUI();
+    };
+
+    function chargerStockageLocal() {
+        appState.taches = JSON.parse(localStorage.getItem('ref_taches') || '[]');
+        appState.ouvriers = JSON.parse(localStorage.getItem('ref_ouvriers') || '[]');
+        appState.saisies = JSON.parse(localStorage.getItem('saisies_hors_ligne') || '[]');
+    }
+
+    async function chargerReferentiels() {
+        if (!navigator.onLine) {
+            updateSyncBadge("☁️ Hors-ligne", "var(--warning-orange)");
+            return;
+        }
+        try {
+            updateSyncBadge("🔄 Chargement...", "var(--warning-orange)");
+            const res = await fetch(SCRIPT_URL);
+            const data = await res.json();
+
+            if (data.status === "success") {
+                if (data.taches && data.taches.length > 0) {
+                    appState.taches = data.taches.map(row => ({
+                        code: String(row[0] || '').trim(),       
+                        desc: String(row[1] || '').trim(),       
+                        quota: parseFloat(row[2]) || 0,          
+                        unite: String(row[3] || '').trim(),      
+                        prix: parseFloat(row[4]) || 8000         
+                    })).filter(t => t.code && t.code.toLowerCase() !== 'id_tache');
+                    localStorage.setItem('ref_taches', JSON.stringify(appState.taches));
+                }
+
+                if (data.ouvriers && data.ouvriers.length > 0) {
+                    appState.ouvriers = data.ouvriers.map(row => ({
+                        id: String(row[0] || '').trim(),         
+                        nom: String(row[1] || '').trim(),        
+                        chef: String(row[2] || '').trim(),       
+                        statut: String(row[3] || '').trim()      
+                    })).filter(o => o.nom && o.id.toLowerCase() !== 'id_ouvrier' && o.statut.toLowerCase() !== 'inactif');
+                    localStorage.setItem('ref_ouvriers', JSON.stringify(appState.ouvriers));
+                }
+                updateSyncBadge("☁️ Connecté", "var(--success-green)");
+                initialiserUI();
+            }
+        } catch (e) {
+            updateSyncBadge("☁️ Mode Local", "var(--warning-orange)");
+            console.error(e);
+        }
+    }
+
+    function initialiserUI() {
+        const selectChef = document.getElementById('select-global-chef');
+        selectChef.innerHTML = '';
+        
+        const chefs = [...new Set(appState.ouvriers.map(o => o.chef).filter(Boolean))];
+        if (chefs.length === 0) chefs.push("Aucun Chef");
+
+        chefs.forEach(chef => {
+            selectChef.innerHTML += `<option value="${chef}">${chef}</option>`;
+        });
+
+        appState.activeChef = selectChef.options.length > 0 ? selectChef.options[0].value : "";
+        onChefChange();
+        rafraichirIndicateurSync();
+    }
+
+    function onChefChange() {
+        appState.activeChef = document.getElementById('select-global-chef').value;
+        const selectOuvrier = document.getElementById('select-ouvrier');
+        selectOuvrier.innerHTML = '';
+
+        const ouvriersDuChef = appState.ouvriers.filter(o => o.chef === appState.activeChef);
+        ouvriersDuChef.forEach(o => {
+            selectOuvrier.innerHTML += `<option value="${o.nom}">${o.nom}</option>`;
+        });
+
+        onOuvrierOrDateChange();
+    }
+
+    function onOuvrierOrDateChange() {
+        const ouvrier = document.getElementById('select-ouvrier').value;
+        const date = document.getElementById('input-saisie-date').value;
+        const banner = document.getElementById('worker-status-banner');
+
+        if (!ouvrier || !date) {
+            banner.innerText = "Sélectionnez un ouvrier et une date.";
+            return;
+        }
+
+        const stats = toutTachesDuJourOuvrier(ouvrier, date);
+        const resteTaches = Math.max(0, MAX_TACHES_JOUR - stats.taches);
+
+        banner.innerHTML = `Ouvrier : <strong>${ouvrier}</strong><br>` +
+                           `Déjà validé le ${date} : <strong>${stats.taches.toFixed(2)} / ${MAX_TACHES_JOUR} Unités</strong> (${stats.ar.toLocaleString()} Ar)<br>` +
+                           `Reste autorisé : <strong>${resteTaches.toFixed(2)} Unités</strong>`;
+        recalculerLignes();
+    }
+
+    function toutTachesDuJourOuvrier(ouvrier, date) {
+        let tachesCumul = 0;
+        let montantCumul = 0;
+        appState.saisies.forEach(s => {
+            if (s.nomOuvrier === ouvrier && s.dateTravail === date) {
+                tachesCumul += (s.taches || 0);
+                montantCumul += (s.montantAr || 0);
+            }
+        });
+        return { taches: tachesCumul, ar: montantCumul };
+    }
+
+    function suggestCode(inp) {
+        // Désactiver la validation si l'utilisateur saisit manuellement
+        inp.setAttribute('data-valid', 'false');
+        
+        const val = (inp.value || '').toLowerCase().trim();
+        const suggestionsDiv = inp.parentElement.querySelector('.autocomplete-suggestions');
+        if (!suggestionsDiv) return;
+        suggestionsDiv.innerHTML = '';
+        if (!appState.taches || appState.taches.length === 0) return;
+
+        const matches = appState.taches.filter(t => {
+            const str = String(t.code + " " + t.desc).toLowerCase();
+            return !val || str.includes(val);
+        });
+
+        matches.slice(0, 15).forEach(m => {
+            const div = document.createElement('div');
+            div.className = 'autocomplete-suggestion';
+            div.innerText = `${m.code} - ${m.desc} (${m.quota} ${m.unite} / ${m.prix} Ar)`;
+            div.onclick = (e) => {
+                e.stopPropagation();
+                inp.value = `${m.code} - ${m.desc}`;
+                inp.setAttribute('data-code', m.code);
+                inp.setAttribute('data-quota', m.quota);
+                inp.setAttribute('data-prix', m.prix);
+                // Valider la saisie car elle provient de la liste
+                inp.setAttribute('data-valid', 'true');
+                suggestionsDiv.innerHTML = '';
+                
+                if(inp.id === 'search-code') {
+                    document.getElementById('consultation-result').innerText = `Quota journalier (1 unité) : ${m.quota} ${m.unite} — Prix : ${m.prix} Ar`;
+                } else {
+                    recalculerLignes();
+                }
+            };
+            suggestionsDiv.appendChild(div);
+        });
+    }
+
+    document.addEventListener('click', (e) => {
+        if (!e.target.classList.contains('act-code') && !e.target.closest('.autocomplete-suggestions')) {
+            document.querySelectorAll('.autocomplete-suggestions').forEach(div => div.innerHTML = '');
+        }
+    });
+
+    function recalculerLignes() {
+        const ouvrier = document.getElementById('select-ouvrier').value;
+        const date = document.getElementById('input-saisie-date').value;
+        if (!ouvrier || !date) return;
+
+        const stats = toutTachesDuJourOuvrier(ouvrier, date);
+        const rows = document.querySelectorAll('.activity-row');
+
+        rows.forEach((row, idx) => {
+            const quota = parseFloat(row.querySelector('.act-code').getAttribute('data-quota'));
+            const hint = row.querySelector('.suggestion-hint');
+            if (isNaN(quota) || quota <= 0) {
+                hint.innerText = '';
+                return;
+            }
+
+            let autresFractions = 0;
+            rows.forEach((rOther, rIdx) => {
+                if (rIdx !== idx) {
+                    const qO = parseFloat(rOther.querySelector('.act-code').getAttribute('data-quota'));
+                    const rO = parseFloat(rOther.querySelector('.act-real').value);
+                    if (!isNaN(qO) && qO > 0 && !isNaN(rO)) autresFractions += (rO / qO);
+                }
+            });
+
+            const resteFractionsDispo = Math.max(0, MAX_TACHES_JOUR - stats.taches - autresFractions);
+            const maxQtAllowed = Math.round(resteFractionsDispo * quota * 100) / 100;
+            hint.innerHTML = `Max recommandé : <strong>${maxQtAllowed}</strong>`;
+        });
+    }
+
+    function enregistrerSaisie() {
+        const ouvrier = document.getElementById('select-ouvrier').value;
+        const date = document.getElementById('input-saisie-date').value;
+        if (!ouvrier || !date) return alert("Sélectionnez un ouvrier et une date.");
+
+        const rows = document.querySelectorAll('.activity-row');
+        let totalFractions = 0;
+        let elements = [];
+        let erreurValidation = false;
+
+        rows.forEach(row => {
+            const inp = row.querySelector('.act-code');
+            const codeTxt = inp.value;
+            const quota = parseFloat(inp.getAttribute('data-quota'));
+            const prix = parseFloat(inp.getAttribute('data-prix')) || 8000;
+            const real = parseFloat(row.querySelector('.act-real').value);
+            const isValid = inp.getAttribute('data-valid') === 'true';
+
+            // Contrôle strict : l'activité doit être sélectionnée dans la liste
+            if (codeTxt || (!isNaN(real) && real > 0)) {
+                if (!isValid) {
+                    alert(`Erreur : L'activité "${codeTxt}" n'est pas valide. Vous devez obligatoirement la sélectionner dans la liste déroulante proposée.`);
+                    erreurValidation = true;
+                }
+            }
+
+            if (!erreurValidation && codeTxt && !isNaN(quota) && quota > 0 && !isNaN(real) && real > 0) {
+                const fraction = real / quota;
+                totalFractions += fraction;
+                elements.push({
+                    tache: codeTxt,
+                    quantite: real,
+                    quota: quota,
+                    prix: prix,
+                    fraction: fraction
+                });
+            }
+        });
+
+        if (erreurValidation) return; // Stoppe l'enregistrement
+        if (elements.length === 0) return alert("Renseignez au moins une tâche valide avec une quantité.");
+
+        const stats = toutTachesDuJourOuvrier(ouvrier, date);
+        const dispo = MAX_TACHES_JOUR - stats.taches;
+        if (dispo <= 0) return alert("Cet ouvrier a déjà atteint son quota maximal de 2 unités aujourd'hui.");
+
+        const ratioAjustement = totalFractions > dispo ? (dispo / totalFractions) : 1;
+
+        elements.forEach(el => {
+            const qteAjustee = el.quantite * ratioAjustement;
+            const tachesAjustees = qteAjustee / el.quota;
+            const montantAr = Math.round(tachesAjustees * el.prix);
+
+            appState.saisies.push({
+                dateTravail: date,
+                chefEquipe: appState.activeChef,
+                nomOuvrier: ouvrier,
+                tache: el.tache,
+                quantite: qteAjustee,
+                taches: tachesAjustees,
+                montantAr: montantAr,
+                synced: false
+            });
+        });
+
+        localStorage.setItem('saisies_hors_ligne', JSON.stringify(appState.saisies));
+        if (ratioAjustement < 1) {
+            alert(`Ajustement: Volumes rabaissés proportionnellement pour respecter le maximum de ${MAX_TACHES_JOUR} unités de travail/jour.`);
+        }
+        
+        rows.forEach(r => {
+            r.querySelector('.act-code').value = '';
+            r.querySelector('.act-real').value = '';
+            r.querySelector('.act-code').setAttribute('data-valid', 'false');
+            r.querySelector('.suggestion-hint').innerText = '';
+        });
+
+        onOuvrierOrDateChange();
+        rafraichirIndicateurSync();
+    }
+
+    // Éditer la saisie depuis le rapport
+    function editerSaisieOuvrier(date, ouvrier) {
+        if(!confirm(`Voulez-vous modifier les activités de ${ouvrier} pour le ${date} ? Cela les rechargera dans l'onglet de saisie.`)) return;
+
+        // 1. Basculer sur l'onglet de saisie
+        switchTab('tab2', document.getElementById('btn-tab-saisie'));
+        
+        document.getElementById('input-saisie-date').value = date;
+        document.getElementById('select-ouvrier').value = ouvrier;
+        
+        // 2. Charger les anciennes données
+        const anciennesSaisies = appState.saisies.filter(s => s.dateTravail === date && s.nomOuvrier === ouvrier);
+        const rows = document.querySelectorAll('.activity-row');
+        
+        // Vider les lignes d'abord
+        rows.forEach(r => {
+            r.querySelector('.act-code').value = '';
+            r.querySelector('.act-real').value = '';
+            r.querySelector('.act-code').setAttribute('data-valid', 'false');
+        });
+        
+        // Remplir avec les données trouvées (jusqu'à 3 max)
+        for(let i=0; i<Math.min(anciennesSaisies.length, rows.length); i++) {
+            const row = rows[i];
+            const data = anciennesSaisies[i];
+            const inputCode = row.querySelector('.act-code');
+            
+            // Rechercher le quota et prix de la tâche dans le référentiel pour recréer l'état
+            const tacheRef = appState.taches.find(t => `${t.code} - ${t.desc}` === data.tache);
+            
+            inputCode.value = data.tache;
+            inputCode.setAttribute('data-valid', 'true');
+            if(tacheRef) {
+                inputCode.setAttribute('data-quota', tacheRef.quota);
+                inputCode.setAttribute('data-prix', tacheRef.prix);
+            }
+            row.querySelector('.act-real').value = data.quantite;
+        }
+
+        // 3. Supprimer les anciennes saisies de l'état (puisqu'elles sont en cours de réédition)
+        appState.saisies = appState.saisies.filter(s => !(s.dateTravail === date && s.nomOuvrier === ouvrier));
+        localStorage.setItem('saisies_hors_ligne', JSON.stringify(appState.saisies));
+        
+        onOuvrierOrDateChange();
+        rafraichirIndicateurSync();
+    }
+
+    function rafraichirRapports() {
+        const d = document.getElementById('report-date').value;
+        const tbodyG = document.querySelector('#table-global-taches tbody');
+        const tbodyD = document.querySelector('#table-detail-ouvriers tbody');
+        tbodyG.innerHTML = '';
+        tbodyD.innerHTML = '';
+
+        const dataJour = appState.saisies.filter(s => s.dateTravail === d);
+        if (dataJour.length === 0) return;
+
+        let recap = {};
+        let details = {};
+
+        dataJour.forEach(s => {
+            if (!recap[s.tache]) recap[s.tache] = { q:0, t:0 };
+            recap[s.tache].q += s.quantite;
+            recap[s.tache].t += s.taches;
+
+            if (!details[s.nomOuvrier]) details[s.nomOuvrier] = {
+                chef: s.chefEquipe,
+                acts: [], totTaches:0, totAr:0
+            };
+            details[s.nomOuvrier].acts.push(`${s.tache} : ${s.quantite.toFixed(2)}`);
+            details[s.nomOuvrier].totTaches += s.taches;
+            details[s.nomOuvrier].totAr += s.montantAr;
+        });
+
+        for (const [t, vals] of Object.entries(recap)) {
+            tbodyG.innerHTML += `<tr><td>${t}</td><td>${vals.q.toFixed(2)}</td><td>${vals.t.toFixed(2)}</td></tr>`;
+        }
+
+        for (const [o, vals] of Object.entries(details)) {
+            tbodyD.innerHTML += `<tr>
+                <td>${vals.chef}</td><td>${o}</td>
+                <td style="white-space: pre-wrap; font-size:0.85rem;">${vals.acts.join('\n')}</td>
+                <td>${vals.totTaches.toFixed(2)}</td><td>${vals.totAr.toLocaleString()}</td>
+                <td>
+                    ${dataJour.find(x => x.nomOuvrier === o && x.synced) ? 
+                      '<span style="color:gray;font-size:0.8rem;">Déjà Transmis</span>' : 
+                      `<button onclick="editerSaisieOuvrier('${d}', '${o}')" style="padding:4px 8px; font-size:0.8rem;">Éditer</button>`}
+                </td>
+            </tr>`;
+        }
+    }
+
+    async function synchroniserDonnees() {
+        if (!navigator.onLine) return alert("Pas de connexion internet. Impossible de synchroniser.");
+        
+        const aSync = appState.saisies.filter(s => !s.synced);
+        if (aSync.length === 0) return alert("Aucune nouvelle donnée à synchroniser.");
+
+        updateSyncBadge("🔄 Synchronisation...", "var(--warning-orange)");
+
+        try {
+            const payload = JSON.stringify(aSync);
+            const res = await fetch(SCRIPT_URL, {
+                method: "POST",
+                mode: "no-cors",
+                headers: { "Content-Type": "application/json" },
+                body: payload
+            });
+
+            // En no-cors, on suppose succès si pas d'erreur
+            appState.saisies.forEach(s => s.synced = true);
+            localStorage.setItem('saisies_hors_ligne', JSON.stringify(appState.saisies));
+            updateSyncBadge("☁️ Connecté (À jour)", "var(--success-green)");
+            rafraichirIndicateurSync();
+            rafraichirRapports();
+            alert("✅ Données transmises avec succès vers Google Sheets.");
+
+        } catch (e) {
+            alert("Erreur de synchronisation. Veuillez réessayer avec un meilleur réseau.");
+            updateSyncBadge("⚠️ Erreur Sync", "var(--danger-red)");
+        }
+    }
+
+    function rafraichirIndicateurSync() {
+        const nbUnsynced = appState.saisies.filter(s => !s.synced).length;
+        document.getElementById('sync-summary-banner').innerHTML = 
+            `Enregistrements (lignes) en attente d'envoi réseau : <strong>${nbUnsynced}</strong>`;
+    }
+
+    function switchTab(tabId, btn) {
+        document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+        document.getElementById(tabId).classList.add('active');
+        btn.classList.add('active');
+        if (tabId === 'tab3') rafraichirRapports();
+    }
+
+    function updateSyncBadge(txt, color) {
+        const b = document.getElementById('sync-status');
+        b.innerText = txt;
+        b.style.background = color;
+    }
+
+    function capturerRapport() {
+        const d = document.getElementById('report-date').value;
+        const cont = document.getElementById('capture-container');
+        cont.innerHTML = `
+            <div style="font-family:sans-serif;">
+                <h1 style="color:#0056b3;text-align:center;">CANOPY ENERGY - Rapport Journalier</h1>
+                <h3 style="text-align:center;">Date : ${d} | Chef d'équipe : ${appState.activeChef}</h3>
+                ${document.getElementById('tab3').innerHTML.replace(/<button.*?>.*?<\/button>/g, '')}
+            </div>
+        `;
+
+        html2canvas(cont).then(canvas => {
+            const link = document.createElement('a');
+            link.download = `Canopy_Rapport_${d}_${appState.activeChef.replace(/\s+/g,'_')}.png`;
+            link.href = canvas.toDataURL("image/png");
+            link.click();
+            cont.innerHTML = '';
+        });
+    }
+
+    window.addEventListener('online', () => chargerReferentiels());
+    window.addEventListener('offline', () => updateSyncBadge("☁️ Hors-ligne", "var(--warning-orange)"));
+
+    // Enregistrement du Service Worker PWA
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('./sw.js')
+                .then(reg => console.log('PWA Service Worker enregistré avec succès:', reg.scope))
+                .catch(err => console.error('Échec enregistrement PWA:', err));
+        });
+    }
+</script>
+
+</body>
+</html>
