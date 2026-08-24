@@ -1,11 +1,11 @@
-const CACHE_NAME = 'canopy-energy-v1';
+const CACHE_NAME = 'canopy-energy-v2';
 const ASSETS_TO_CACHE = [
-  './',
+  './index.html',
   './manifest.json',
   'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js'
 ];
 
-// Installation : Mise en cache des ressources critiques
+// Installation : Mise en cache des ressources
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
@@ -31,9 +31,8 @@ self.addEventListener('activate', (event) => {
   self.clients.claim();
 });
 
-// Interception des requêtes : Servir le cache si hors-ligne
+// Interception des requêtes
 self.addEventListener('fetch', (event) => {
-  // Ne pas intercepter les requêtes de synchro Google Apps Script (laisser passer sur le réseau)
   if (event.request.url.includes('script.google.com')) {
     return;
   }
@@ -50,10 +49,7 @@ self.addEventListener('fetch', (event) => {
         });
       });
     }).catch(() => {
-      // Retour de secours si ni réseau ni cache (ex: mode avion complet)
-      if (event.request.mode === 'navigate') {
-        return caches.match('./');
-      }
+      return caches.match('./index.html');
     })
   );
 });
