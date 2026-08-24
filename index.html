@@ -29,71 +29,72 @@
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; -webkit-tap-highlight-color: transparent; }
         
-        body { background-color: var(--bg-color); color: var(--text-main); font-size: 1.1rem; min-height: 100vh; display: flex; flex-direction: column; }
+        /* TAILLE DE BASE AUGMENTÉE */
+        body { background-color: var(--bg-color); color: var(--text-main); font-size: 1.25rem; min-height: 100vh; display: flex; flex-direction: column; }
         
-        /* HEADER AVEC BOUTON MENU HAMBURGER */
-        header { background: var(--primary-dark); color: white; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+        /* HEADER */
+        header { background: var(--primary-dark); color: white; padding: 18px 22px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
         .header-left { display: flex; align-items: center; gap: 14px; }
-        .menu-btn { background: none; border: none; color: white; font-size: 1.8rem; cursor: pointer; padding: 0; display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 8px; }
+        .menu-btn { background: none; border: none; color: white; font-size: 2.2rem; cursor: pointer; padding: 0; display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 8px; }
         .menu-btn:active { background: rgba(255,255,255,0.2); }
-        .brand-title { font-size: 1.4rem; font-weight: 700; }
-        .sync-badge { font-size: 0.9rem; padding: 8px 14px; border-radius: 20px; background: rgba(255,255,255,0.25); font-weight: 700; }
+        .brand-title { font-size: 1.6rem; font-weight: 800; }
+        .sync-badge { font-size: 1rem; padding: 8px 16px; border-radius: 20px; background: rgba(255,255,255,0.25); font-weight: 700; }
 
-        /* MENU LATÉRAL STYLE GEMINI (DRAWER) */
+        /* MENU LATÉRAL STYLE GEMINI */
         .sidebar-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 200; display: none; backdrop-filter: blur(2px); }
         .sidebar-overlay.open { display: block; }
         
-        aside.sidebar { position: fixed; top: 0; left: -300px; width: 280px; height: 100%; background: #ffffff; z-index: 201; box-shadow: 4px 0 25px rgba(0,0,0,0.15); transition: left 0.3s ease; display: flex; flex-direction: column; }
+        aside.sidebar { position: fixed; top: 0; left: -320px; width: 300px; height: 100%; background: #ffffff; z-index: 201; box-shadow: 4px 0 25px rgba(0,0,0,0.15); transition: left 0.3s ease; display: flex; flex-direction: column; }
         aside.sidebar.open { left: 0; }
         
-        .sidebar-header { padding: 20px; background: var(--primary-dark); color: white; display: flex; justify-content: space-between; align-items: center; font-size: 1.3rem; font-weight: 700; }
-        .sidebar-close { background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer; }
+        .sidebar-header { padding: 22px; background: var(--primary-dark); color: white; display: flex; justify-content: space-between; align-items: center; font-size: 1.4rem; font-weight: 800; }
+        .sidebar-close { background: none; border: none; color: white; font-size: 1.8rem; cursor: pointer; }
         
-        .sidebar-nav { padding: 20px 12px; display: flex; flex-direction: column; gap: 10px; flex: 1; overflow-y: auto; }
-        .nav-item { display: flex; align-items: center; gap: 14px; width: 100%; padding: 16px 18px; border-radius: 12px; border: none; background: transparent; color: var(--text-main); font-size: 1.15rem; font-weight: 700; text-align: left; cursor: pointer; }
+        .sidebar-nav { padding: 22px 14px; display: flex; flex-direction: column; gap: 12px; flex: 1; overflow-y: auto; }
+        .nav-item { display: flex; align-items: center; gap: 16px; width: 100%; padding: 18px 20px; border-radius: 12px; border: none; background: transparent; color: var(--text-main); font-size: 1.25rem; font-weight: 700; text-align: left; cursor: pointer; }
         .nav-item:active, .nav-item:hover { background: var(--primary-light); color: var(--primary-dark); }
         .nav-item.active { background: var(--primary-light); color: var(--primary-dark); border-left: 6px solid var(--primary); }
-        .nav-icon { font-size: 1.5rem; }
+        .nav-icon { font-size: 1.7rem; }
 
-        /* CONTENEUR PRINCIPAL PLEIN ÉCRAN */
-        .container { padding: 20px; max-width: 900px; margin: 0 auto; width: 100%; flex: 1; padding-bottom: 50px; }
+        /* CONTENEUR PRINCIPAL */
+        .container { padding: 20px; max-width: 900px; margin: 0 auto; width: 100%; flex: 1; padding-bottom: 60px; }
 
         /* CARTES */
-        .card { background: var(--card-bg); border-radius: var(--radius); padding: 22px; margin-bottom: 20px; box-shadow: 0 4px 6px -2px rgba(0,0,0,0.08); }
-        .card h2 { font-size: 1.35rem; color: var(--text-main); margin-bottom: 18px; display: flex; align-items: center; gap: 10px; font-weight: 700; }
+        .card { background: var(--card-bg); border-radius: var(--radius); padding: 24px; margin-bottom: 22px; box-shadow: 0 4px 6px -2px rgba(0,0,0,0.08); }
+        .card h2 { font-size: 1.5rem; color: var(--text-main); margin-bottom: 20px; display: flex; align-items: center; gap: 12px; font-weight: 800; }
 
-        /* FORMULAIRES & TEXTES AGRANDIS */
-        .form-group { margin-bottom: 18px; }
-        label { display: block; margin-bottom: 8px; font-weight: 700; font-size: 1.05rem; color: var(--text-main); }
+        /* FORMULAIRES & TEXTES TRÈS LISIBLES */
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 10px; font-weight: 800; font-size: 1.2rem; color: var(--text-main); }
         
-        input, select { width: 100%; padding: 16px; border: 2px solid var(--border); border-radius: 12px; font-size: 1.15rem; background: #f8fafc; color: var(--text-main); outline: none; appearance: none; font-weight: 600; }
+        input, select { width: 100%; padding: 18px; border: 2px solid var(--border); border-radius: 12px; font-size: 1.25rem; background: #f8fafc; color: var(--text-main); outline: none; appearance: none; font-weight: 700; }
         input:focus, select:focus { border-color: var(--primary); box-shadow: 0 0 0 4px var(--primary-light); background: #fff; }
         
         /* ACTIVITÉS */
-        .activity-row { background: #f8fafc; border: 2px solid var(--border); border-radius: 12px; padding: 18px; margin-bottom: 18px; }
+        .activity-row { background: #f8fafc; border: 2px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 20px; }
         .relative-wrapper { position: relative; }
         
         /* SUGGESTIONS AUTOCOMPLETE */
-        .autocomplete-suggestions { position: absolute; top: 100%; left: 0; right: 0; background: #fff; border: 2px solid var(--primary); border-radius: 12px; margin-top: 6px; max-height: 280px; overflow-y: auto; z-index: 1000; box-shadow: 0 10px 25px -3px rgba(0,0,0,0.15); }
-        .autocomplete-suggestion { padding: 16px; border-bottom: 1px solid #e2e8f0; font-size: 1.1rem; cursor: pointer; font-weight: 600; }
+        .autocomplete-suggestions { position: absolute; top: 100%; left: 0; right: 0; background: #fff; border: 2px solid var(--primary); border-radius: 12px; margin-top: 6px; max-height: 320px; overflow-y: auto; z-index: 1000; box-shadow: 0 10px 25px -3px rgba(0,0,0,0.15); }
+        .autocomplete-suggestion { padding: 18px; border-bottom: 1px solid #e2e8f0; font-size: 1.2rem; cursor: pointer; font-weight: 700; }
         .autocomplete-suggestion:active { background: var(--primary-light); }
-        .suggestion-hint { font-size: 1rem; color: var(--primary); margin-top: 8px; font-weight: 700; text-align: right; }
+        .suggestion-hint { font-size: 1.1rem; color: var(--primary); margin-top: 10px; font-weight: 800; text-align: right; }
 
-        /* BOUTONS GAILLARDS */
-        button.action-btn { width: 100%; padding: 18px; border-radius: 12px; border: none; font-size: 1.15rem; font-weight: 700; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px; }
+        /* BOUTONS */
+        button.action-btn { width: 100%; padding: 20px; border-radius: 12px; border: none; font-size: 1.25rem; font-weight: 800; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 10px; }
         button.action-btn:active { transform: scale(0.98); }
         button.primary { background: var(--primary); color: white; box-shadow: 0 4px 6px -1px rgba(37,99,235,0.3); }
         button.success { background: var(--success); color: white; box-shadow: 0 4px 6px -1px rgba(5,150,105,0.3); }
-        button.warning { background: var(--warning); color: #fff; font-weight: 700; }
+        button.warning { background: var(--warning); color: #fff; font-weight: 800; }
         
         /* BANNIÈRES */
-        .status-banner { padding: 18px; border-radius: 12px; background: var(--primary-light); border-left: 6px solid var(--primary); color: var(--primary-dark); font-size: 1.1rem; line-height: 1.6; margin-bottom: 18px; font-weight: 600; }
+        .status-banner { padding: 20px; border-radius: 12px; background: var(--primary-light); border-left: 6px solid var(--primary); color: var(--primary-dark); font-size: 1.2rem; line-height: 1.6; margin-bottom: 20px; font-weight: 700; }
 
-        /* TABLEAUX LISIBLES */
+        /* TABLEAUX GRANDS ET LISIBLES */
         .table-wrapper { overflow-x: auto; border-radius: 12px; border: 2px solid var(--border); }
         table { width: 100%; border-collapse: collapse; background: #fff; }
-        th, td { padding: 16px 14px; text-align: left; font-size: 1.05rem; border-bottom: 2px solid var(--border); white-space: nowrap; }
-        th { background: #f1f5f9; color: var(--text-main); font-weight: 700; }
+        th, td { padding: 18px 16px; text-align: left; font-size: 1.15rem; border-bottom: 2px solid var(--border); white-space: nowrap; }
+        th { background: #f1f5f9; color: var(--text-main); font-weight: 800; }
 
         .tab-content { display: none; }
         .tab-content.active { display: block; }
@@ -103,7 +104,7 @@
 </head>
 <body>
 
-<!-- HEADER AVEC BOUTON MENU -->
+<!-- HEADER -->
 <header>
     <div class="header-left">
         <button class="menu-btn" onclick="toggleSidebar()">☰</button>
@@ -112,7 +113,7 @@
     <div id="sync-status" class="sync-badge">☁️ Hors-ligne</div>
 </header>
 
-<!-- OVERLAY ET MENU LATÉRAL (STYLE GEMINI) -->
+<!-- OVERLAY ET MENU LATÉRAL -->
 <div id="sidebar-overlay" class="sidebar-overlay" onclick="toggleSidebar()"></div>
 <aside id="sidebar" class="sidebar">
     <div class="sidebar-header">
@@ -156,7 +157,7 @@
                 <input type="text" id="search-code" class="act-code" inputmode="search" oninput="suggestCode(this)" onfocus="suggestCode(this)" placeholder="Rechercher une tâche...">
                 <div class="autocomplete-suggestions"></div>
             </div>
-            <div id="consultation-result" style="margin-top:16px; font-weight:700; font-size:1.1rem; color:var(--primary); padding:16px; background:var(--primary-light); border-radius:12px; display:none;"></div>
+            <div id="consultation-result" style="margin-top:18px; font-weight:800; font-size:1.2rem; color:var(--primary); padding:18px; background:var(--primary-light); border-radius:12px; display:none;"></div>
         </div>
     </div>
 
@@ -222,7 +223,7 @@
                 </div>
             </div>
 
-            <button onclick="enregistrerSaisie()" class="action-btn success" style="margin-top:16px;">💾 Enregistrer l'ouvrier</button>
+            <button onclick="enregistrerSaisie()" class="action-btn success" style="margin-top:18px;">💾 Enregistrer l'ouvrier</button>
         </div>
     </div>
 
@@ -254,7 +255,7 @@
                     <tbody></tbody>
                 </table>
             </div>
-            <button onclick="capturerRapport()" class="action-btn warning" style="margin-top:20px;">📸 Exporter en Image</button>
+            <button onclick="capturerRapport()" class="action-btn warning" style="margin-top:22px;">📸 Exporter en Image</button>
         </div>
     </div>
 
@@ -266,8 +267,8 @@
                 Lignes en attente : <strong>0</strong>
             </div>
 
-            <button onclick="synchroniserDonnees()" class="action-btn primary" style="margin-bottom:16px;">📤 Envoyer vers Google Sheets</button>
-            <button onclick="chargerReferentiels()" class="action-btn" style="background:#e2e8f0; color:var(--text-main); font-weight:700;">📥 Mettre à jour les bases</button>
+            <button onclick="synchroniserDonnees()" class="action-btn primary" style="margin-bottom:18px;">📤 Envoyer vers Google Sheets</button>
+            <button onclick="chargerReferentiels()" class="action-btn" style="background:#e2e8f0; color:var(--text-main); font-weight:800;">📥 Mettre à jour les bases</button>
         </div>
     </div>
 </div>
@@ -397,7 +398,7 @@
         appState.taches.filter(t => String(t.code + " " + t.desc).toLowerCase().includes(val)).slice(0, 10).forEach(m => {
             const div = document.createElement('div');
             div.className = 'autocomplete-suggestion';
-            div.innerHTML = `<strong>${m.code}</strong> - ${m.desc}<br><span style="color:var(--text-muted); font-size:0.95rem;">Quota: ${m.quota} ${m.unite}</span>`;
+            div.innerHTML = `<strong>${m.code}</strong> - ${m.desc}<br><span style="color:var(--text-muted); font-size:1.05rem;">Quota: ${m.quota} ${m.unite}</span>`;
             div.onclick = (e) => {
                 e.stopPropagation();
                 inp.value = `${m.code} - ${m.desc}`;
@@ -544,7 +545,7 @@
             tbodyG.innerHTML += `<tr><td>${t}</td><td>${v.q.toFixed(2)}</td><td>${v.t.toFixed(2)}</td></tr>`;
         }
         for (const [o, v] of Object.entries(details)) {
-            tbodyD.innerHTML += `<tr><td><strong>${o}</strong></td><td style="white-space:pre-wrap;">${v.acts.join('<br>')}</td><td>${v.totTaches.toFixed(2)}</td><td>${v.totAr.toLocaleString()}</td><td>${dataJour.find(x => x.nomOuvrier === o && x.synced) ? '✅' : `<button onclick="editerSaisieOuvrier('${d}', '${o}')" style="padding:8px 12px; font-size:0.9rem; background:#e2e8f0; color:var(--text-main);">Modifier</button>`}</td></tr>`;
+            tbodyD.innerHTML += `<tr><td><strong>${o}</strong></td><td style="white-space:pre-wrap;">${v.acts.join('<br>')}</td><td>${v.totTaches.toFixed(2)}</td><td>${v.totAr.toLocaleString()}</td><td>${dataJour.find(x => x.nomOuvrier === o && x.synced) ? '✅' : `<button onclick="editerSaisieOuvrier('${d}', '${o}')" style="padding:10px 14px; font-size:1rem; background:#e2e8f0; color:var(--text-main); font-weight:700;">Modifier</button>`}</td></tr>`;
         }
     }
 
@@ -580,7 +581,6 @@
         document.getElementById('global-context-card').style.display = (tabId === 'tab4') ? 'none' : 'block';
         if (tabId === 'tab3') rafraichirRapports();
         
-        // Ferme le menu latéral automatiquement sur mobile après sélection
         toggleSidebar();
         window.scrollTo(0, 0);
     }
@@ -593,9 +593,9 @@
     function capturerRapport() {
         const d = document.getElementById('report-date').value;
         const cont = document.getElementById('capture-container');
-        cont.innerHTML = `<div style="font-family:sans-serif; font-size:1.1rem;">
-            <h1 style="color:#1e40af;text-align:center;">CANOPY ENERGY</h1>
-            <h3 style="text-align:center;">Bilan: ${d} | Chef: ${appState.activeChef}</h3>
+        cont.innerHTML = `<div style="font-family:sans-serif; font-size:1.2rem;">
+            <h1 style="color:#1e40af;text-align:center;font-size:1.8rem;">CANOPY ENERGY</h1>
+            <h3 style="text-align:center;font-size:1.3rem;">Bilan: ${d} | Chef: ${appState.activeChef}</h3>
             ${document.getElementById('tab3').innerHTML.replace(/<button.*?>.*?<\/button>/g, '')}
         </div>`;
         html2canvas(cont).then(canvas => {
