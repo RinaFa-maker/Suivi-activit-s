@@ -2,10 +2,8 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <!-- Viewport optimisé pour bloquer le zoom manuel et forcer l'échelle mobile -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     
-    <!-- PWA Légère -->
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#1e40af">
     <link rel="apple-touch-icon" href="icon-192.png">
@@ -15,94 +13,134 @@
     
     <style>
         :root {
-            /* Palette Moderne */
             --bg-color: #f1f5f9;
             --card-bg: #ffffff;
             --primary: #2563eb;
             --primary-dark: #1e40af;
             --primary-light: #dbeafe;
             --text-main: #0f172a;
-            --text-muted: #64748b;
-            --border: #e2e8f0;
-            --success: #10b981;
-            --warning: #f59e0b;
-            --danger: #ef4444;
+            --text-muted: #475569;
+            --border: #cbd5e1;
+            --success: #059669;
+            --warning: #d97706;
+            --danger: #dc2626;
             --radius: 16px;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; -webkit-tap-highlight-color: transparent; }
         
-        body { background-color: var(--bg-color); color: var(--text-main); padding-bottom: 80px; /* Espace pour la barre du bas */ }
+        body { background-color: var(--bg-color); color: var(--text-main); font-size: 1.1rem; min-height: 100vh; display: flex; flex-direction: column; }
         
-        /* HEADER FIXE */
+        /* HEADER AVEC BOUTON MENU HAMBURGER */
         header { background: var(--primary-dark); color: white; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
-        .brand-title { font-size: 1.25rem; font-weight: 700; letter-spacing: 0.5px; }
-        .sync-badge { font-size: 0.75rem; padding: 6px 12px; border-radius: 20px; background: rgba(255,255,255,0.2); font-weight: 600; display: flex; align-items: center; gap: 4px; }
+        .header-left { display: flex; align-items: center; gap: 14px; }
+        .menu-btn { background: none; border: none; color: white; font-size: 1.8rem; cursor: pointer; padding: 0; display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 8px; }
+        .menu-btn:active { background: rgba(255,255,255,0.2); }
+        .brand-title { font-size: 1.4rem; font-weight: 700; }
+        .sync-badge { font-size: 0.9rem; padding: 8px 14px; border-radius: 20px; background: rgba(255,255,255,0.25); font-weight: 700; }
 
-        /* CONTENEUR PRINCIPAL */
-        .container { padding: 16px; max-width: 800px; margin: 0 auto; }
-
-        /* CARTES MODERNES */
-        .card { background: var(--card-bg); border-radius: var(--radius); padding: 20px; margin-bottom: 16px; box-shadow: 0 4px 6px -2px rgba(0,0,0,0.05), 0 2px 4px -2px rgba(0,0,0,0.05); }
-        .card h2 { font-size: 1.1rem; color: var(--text-main); margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
-
-        /* FORMULAIRES & CHAMPS (Opti Android) */
-        .form-group { margin-bottom: 16px; }
-        label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 0.9rem; color: var(--text-muted); }
-        /* Font-size: 16px empêche le zoom sur Android/iOS */
-        input, select { width: 100%; padding: 14px; border: 1px solid var(--border); border-radius: 12px; font-size: 16px; background: #f8fafc; color: var(--text-main); transition: all 0.2s ease; outline: none; appearance: none; }
-        input:focus, select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-light); background: #fff; }
+        /* MENU LATÉRAL STYLE GEMINI (DRAWER) */
+        .sidebar-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 200; display: none; backdrop-filter: blur(2px); }
+        .sidebar-overlay.open { display: block; }
         
-        /* LAYOUT ACTIVITÉS */
-        .activity-row { background: #f8fafc; border: 1px solid var(--border); border-radius: 12px; padding: 12px; margin-bottom: 12px; }
-        .activity-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 12px; }
+        aside.sidebar { position: fixed; top: 0; left: -300px; width: 280px; height: 100%; background: #ffffff; z-index: 201; box-shadow: 4px 0 25px rgba(0,0,0,0.15); transition: left 0.3s ease; display: flex; flex-direction: column; }
+        aside.sidebar.open { left: 0; }
+        
+        .sidebar-header { padding: 20px; background: var(--primary-dark); color: white; display: flex; justify-content: space-between; align-items: center; font-size: 1.3rem; font-weight: 700; }
+        .sidebar-close { background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer; }
+        
+        .sidebar-nav { padding: 20px 12px; display: flex; flex-direction: column; gap: 10px; flex: 1; overflow-y: auto; }
+        .nav-item { display: flex; align-items: center; gap: 14px; width: 100%; padding: 16px 18px; border-radius: 12px; border: none; background: transparent; color: var(--text-main); font-size: 1.15rem; font-weight: 700; text-align: left; cursor: pointer; }
+        .nav-item:active, .nav-item:hover { background: var(--primary-light); color: var(--primary-dark); }
+        .nav-item.active { background: var(--primary-light); color: var(--primary-dark); border-left: 6px solid var(--primary); }
+        .nav-icon { font-size: 1.5rem; }
+
+        /* CONTENEUR PRINCIPAL PLEIN ÉCRAN */
+        .container { padding: 20px; max-width: 900px; margin: 0 auto; width: 100%; flex: 1; padding-bottom: 50px; }
+
+        /* CARTES */
+        .card { background: var(--card-bg); border-radius: var(--radius); padding: 22px; margin-bottom: 20px; box-shadow: 0 4px 6px -2px rgba(0,0,0,0.08); }
+        .card h2 { font-size: 1.35rem; color: var(--text-main); margin-bottom: 18px; display: flex; align-items: center; gap: 10px; font-weight: 700; }
+
+        /* FORMULAIRES & TEXTES AGRANDIS */
+        .form-group { margin-bottom: 18px; }
+        label { display: block; margin-bottom: 8px; font-weight: 700; font-size: 1.05rem; color: var(--text-main); }
+        
+        input, select { width: 100%; padding: 16px; border: 2px solid var(--border); border-radius: 12px; font-size: 1.15rem; background: #f8fafc; color: var(--text-main); outline: none; appearance: none; font-weight: 600; }
+        input:focus, select:focus { border-color: var(--primary); box-shadow: 0 0 0 4px var(--primary-light); background: #fff; }
+        
+        /* ACTIVITÉS */
+        .activity-row { background: #f8fafc; border: 2px solid var(--border); border-radius: 12px; padding: 18px; margin-bottom: 18px; }
         .relative-wrapper { position: relative; }
         
-        /* AUTOCOMPLETE */
-        .autocomplete-suggestions { position: absolute; top: 100%; left: 0; right: 0; background: #fff; border: 1px solid var(--border); border-radius: 12px; margin-top: 4px; max-height: 220px; overflow-y: auto; z-index: 1000; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
-        .autocomplete-suggestion { padding: 14px; border-bottom: 1px solid #f1f5f9; font-size: 0.95rem; cursor: pointer; }
+        /* SUGGESTIONS AUTOCOMPLETE */
+        .autocomplete-suggestions { position: absolute; top: 100%; left: 0; right: 0; background: #fff; border: 2px solid var(--primary); border-radius: 12px; margin-top: 6px; max-height: 280px; overflow-y: auto; z-index: 1000; box-shadow: 0 10px 25px -3px rgba(0,0,0,0.15); }
+        .autocomplete-suggestion { padding: 16px; border-bottom: 1px solid #e2e8f0; font-size: 1.1rem; cursor: pointer; font-weight: 600; }
         .autocomplete-suggestion:active { background: var(--primary-light); }
-        .suggestion-hint { font-size: 0.8rem; color: var(--primary); margin-top: 6px; font-weight: 600; text-align: right; }
+        .suggestion-hint { font-size: 1rem; color: var(--primary); margin-top: 8px; font-weight: 700; text-align: right; }
 
-        /* BOUTONS MASSIFS */
-        button { width: 100%; padding: 16px; border-radius: 12px; border: none; font-size: 1rem; font-weight: 700; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px; transition: transform 0.1s; }
-        button:active { transform: scale(0.98); }
+        /* BOUTONS GAILLARDS */
+        button.action-btn { width: 100%; padding: 18px; border-radius: 12px; border: none; font-size: 1.15rem; font-weight: 700; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px; }
+        button.action-btn:active { transform: scale(0.98); }
         button.primary { background: var(--primary); color: white; box-shadow: 0 4px 6px -1px rgba(37,99,235,0.3); }
-        button.success { background: var(--success); color: white; box-shadow: 0 4px 6px -1px rgba(16,185,129,0.3); }
-        button.warning { background: var(--warning); color: #000; }
+        button.success { background: var(--success); color: white; box-shadow: 0 4px 6px -1px rgba(5,150,105,0.3); }
+        button.warning { background: var(--warning); color: #fff; font-weight: 700; }
         
-        /* BANNIÈRES STATUTS */
-        .status-banner { padding: 16px; border-radius: 12px; background: var(--primary-light); border-left: 4px solid var(--primary); color: var(--primary-dark); font-size: 0.95rem; line-height: 1.5; margin-bottom: 16px; }
+        /* BANNIÈRES */
+        .status-banner { padding: 18px; border-radius: 12px; background: var(--primary-light); border-left: 6px solid var(--primary); color: var(--primary-dark); font-size: 1.1rem; line-height: 1.6; margin-bottom: 18px; font-weight: 600; }
 
-        /* TABLEAUX RESPONSIVE */
-        .table-wrapper { overflow-x: auto; border-radius: 12px; border: 1px solid var(--border); }
+        /* TABLEAUX LISIBLES */
+        .table-wrapper { overflow-x: auto; border-radius: 12px; border: 2px solid var(--border); }
         table { width: 100%; border-collapse: collapse; background: #fff; }
-        th, td { padding: 14px 12px; text-align: left; font-size: 0.9rem; border-bottom: 1px solid var(--border); white-space: nowrap; }
-        th { background: #f8fafc; color: var(--text-muted); font-weight: 600; }
+        th, td { padding: 16px 14px; text-align: left; font-size: 1.05rem; border-bottom: 2px solid var(--border); white-space: nowrap; }
+        th { background: #f1f5f9; color: var(--text-main); font-weight: 700; }
 
-        /* BOTTOM NAVIGATION (Mobile Opti) */
-        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); display: flex; justify-content: space-around; padding: 10px 5px 20px 5px; box-shadow: 0 -4px 12px rgba(0,0,0,0.05); z-index: 100; border-top: 1px solid var(--border); }
-        .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; color: var(--text-muted); font-size: 0.75rem; font-weight: 600; border: none; background: none; padding: 8px 0; }
-        .nav-item.active { color: var(--primary); }
-        .nav-icon { font-size: 1.4rem; margin-bottom: 2px; }
-        
-        .tab-content { display: none; animation: fadeIn 0.3s ease; }
+        .tab-content { display: none; }
         .tab-content.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-        #capture-container { position: absolute; left: -9999px; top: 0; width: 850px; background: white; padding: 30px; }
+        #capture-container { position: absolute; left: -9999px; top: 0; width: 900px; background: white; padding: 30px; }
     </style>
 </head>
 <body>
 
+<!-- HEADER AVEC BOUTON MENU -->
 <header>
-    <div class="brand-title">🌿 Canopy Energy</div>
+    <div class="header-left">
+        <button class="menu-btn" onclick="toggleSidebar()">☰</button>
+        <div class="brand-title">🌿 Canopy Energy</div>
+    </div>
     <div id="sync-status" class="sync-badge">☁️ Hors-ligne</div>
 </header>
 
+<!-- OVERLAY ET MENU LATÉRAL (STYLE GEMINI) -->
+<div id="sidebar-overlay" class="sidebar-overlay" onclick="toggleSidebar()"></div>
+<aside id="sidebar" class="sidebar">
+    <div class="sidebar-header">
+        <span>Navigation</span>
+        <button class="sidebar-close" onclick="toggleSidebar()">✕</button>
+    </div>
+    <nav class="sidebar-nav">
+        <button class="nav-item active" onclick="switchTab('tab1', this)">
+            <span class="nav-icon">🔍</span>
+            <span>Recherche</span>
+        </button>
+        <button class="nav-item" id="btn-tab-saisie" onclick="switchTab('tab2', this)">
+            <span class="nav-icon">✍️</span>
+            <span>Saisie</span>
+        </button>
+        <button class="nav-item" onclick="switchTab('tab3', this)">
+            <span class="nav-icon">📊</span>
+            <span>Bilan</span>
+        </button>
+        <button class="nav-item" onclick="switchTab('tab4', this)">
+            <span class="nav-icon">🔄</span>
+            <span>Sync</span>
+        </button>
+    </nav>
+</aside>
+
 <div class="container">
     
-    <!-- CARTE CONTEXTE GLOBALE (Fixe sur toutes les pages sauf Sync) -->
     <div class="card" id="global-context-card">
         <div class="form-group" style="margin-bottom: 0;">
             <label>👤 Chef d'équipe</label>
@@ -115,22 +153,19 @@
         <div class="card">
             <h2>🔍 Catalogue des Tâches</h2>
             <div class="form-group relative-wrapper">
-                <!-- inputmode="search" adapte le clavier Android -->
-                <input type="text" id="search-code" class="act-code" inputmode="search" oninput="suggestCode(this)" onfocus="suggestCode(this)" placeholder="Ex: Désherbage, 125A...">
+                <input type="text" id="search-code" class="act-code" inputmode="search" oninput="suggestCode(this)" onfocus="suggestCode(this)" placeholder="Rechercher une tâche...">
                 <div class="autocomplete-suggestions"></div>
             </div>
-            <div id="consultation-result" style="margin-top:16px; font-weight:600; color:var(--primary); padding:12px; background:var(--primary-light); border-radius:8px; display:none;"></div>
+            <div id="consultation-result" style="margin-top:16px; font-weight:700; font-size:1.1rem; color:var(--primary); padding:16px; background:var(--primary-light); border-radius:12px; display:none;"></div>
         </div>
     </div>
 
     <!-- ONGLET 2 : SAISIE -->
     <div id="tab2" class="tab-content">
         <div class="card">
-            <div style="display:flex; gap:12px; margin-bottom:16px;">
-                <div class="form-group" style="flex:1;">
-                    <label>📅 Date</label>
-                    <input type="date" id="input-saisie-date" onchange="onOuvrierOrDateChange()">
-                </div>
+            <div class="form-group">
+                <label>📅 Date du travail</label>
+                <input type="date" id="input-saisie-date" onchange="onOuvrierOrDateChange()">
             </div>
 
             <div class="form-group">
@@ -138,125 +173,104 @@
                 <select id="select-ouvrier" onchange="onOuvrierOrDateChange()"></select>
             </div>
 
-            <div id="worker-status-banner" class="status-banner">Sélectionnez un ouvrier pour voir son quota.</div>
+            <div id="worker-status-banner" class="status-banner">Sélectionnez un ouvrier.</div>
         </div>
 
         <div class="card">
-            <h2>✍️ Activités du jour (Max 3 lignes)</h2>
+            <h2>✍️ Saisie des Activités (Max 3)</h2>
             <div id="activities-container">
-                <!-- Activité 1 -->
+                <!-- Ligne 1 -->
                 <div class="activity-row">
-                    <div class="form-group relative-wrapper" style="margin-bottom: 8px;">
+                    <div class="form-group relative-wrapper">
                         <label>Tâche 1</label>
-                        <input type="text" class="act-code" inputmode="search" data-valid="false" placeholder="Rechercher une tâche..." oninput="suggestCode(this)" onfocus="suggestCode(this)">
+                        <input type="text" class="act-code" inputmode="search" data-valid="false" placeholder="Choisir la tâche..." oninput="suggestCode(this)" onfocus="suggestCode(this)">
                         <div class="autocomplete-suggestions"></div>
                     </div>
                     <div class="form-group" style="margin-bottom: 0;">
-                        <label>Quantité (Volume réalisé)</label>
-                        <!-- inputmode="decimal" lance le pavé numérique direct ! -->
+                        <label>Quantité réalisée</label>
                         <input type="number" class="act-real" inputmode="decimal" min="0" step="any" placeholder="0" oninput="recalculerLignes()">
                         <div class="suggestion-hint"></div>
                     </div>
                 </div>
                 
-                <!-- Activité 2 -->
+                <!-- Ligne 2 -->
                 <div class="activity-row">
-                    <div class="form-group relative-wrapper" style="margin-bottom: 8px;">
+                    <div class="form-group relative-wrapper">
                         <label>Tâche 2</label>
-                        <input type="text" class="act-code" inputmode="search" data-valid="false" placeholder="Rechercher une tâche..." oninput="suggestCode(this)" onfocus="suggestCode(this)">
+                        <input type="text" class="act-code" inputmode="search" data-valid="false" placeholder="Choisir la tâche..." oninput="suggestCode(this)" onfocus="suggestCode(this)">
                         <div class="autocomplete-suggestions"></div>
                     </div>
                     <div class="form-group" style="margin-bottom: 0;">
-                        <label>Quantité (Volume réalisé)</label>
+                        <label>Quantité réalisée</label>
                         <input type="number" class="act-real" inputmode="decimal" min="0" step="any" placeholder="0" oninput="recalculerLignes()">
                         <div class="suggestion-hint"></div>
                     </div>
                 </div>
 
-                <!-- Activité 3 -->
+                <!-- Ligne 3 -->
                 <div class="activity-row">
-                    <div class="form-group relative-wrapper" style="margin-bottom: 8px;">
+                    <div class="form-group relative-wrapper">
                         <label>Tâche 3</label>
-                        <input type="text" class="act-code" inputmode="search" data-valid="false" placeholder="Rechercher une tâche..." oninput="suggestCode(this)" onfocus="suggestCode(this)">
+                        <input type="text" class="act-code" inputmode="search" data-valid="false" placeholder="Choisir la tâche..." oninput="suggestCode(this)" onfocus="suggestCode(this)">
                         <div class="autocomplete-suggestions"></div>
                     </div>
                     <div class="form-group" style="margin-bottom: 0;">
-                        <label>Quantité (Volume réalisé)</label>
+                        <label>Quantité réalisée</label>
                         <input type="number" class="act-real" inputmode="decimal" min="0" step="any" placeholder="0" oninput="recalculerLignes()">
                         <div class="suggestion-hint"></div>
                     </div>
                 </div>
             </div>
 
-            <button onclick="enregistrerSaisie()" class="success" style="margin-top:16px;">💾 Enregistrer l'ouvrier</button>
+            <button onclick="enregistrerSaisie()" class="action-btn success" style="margin-top:16px;">💾 Enregistrer l'ouvrier</button>
         </div>
     </div>
 
-    <!-- ONGLET 3 : RAPPORTS -->
+    <!-- ONGLET 3 : BILAN -->
     <div id="tab3" class="tab-content">
         <div class="card">
-            <h2>📊 Bilan de la journée</h2>
-            <div class="form-group">
-                <label>Sélectionner la date</label>
+            <h2>📊 Bilan Journalier</h2>
+            <div class="form-group" style="margin-bottom:0;">
+                <label>Date du rapport</label>
                 <input type="date" id="report-date" onchange="rafraichirRapports()">
             </div>
         </div>
 
         <div class="card">
-            <h2 style="font-size:1rem;">Totaux Globaux</h2>
+            <h2>Volumes Globaux</h2>
             <div class="table-wrapper">
                 <table id="table-global-taches">
-                    <thead><tr><th>Tâche</th><th>Vol. Cumulé</th><th>Unités</th></tr></thead>
+                    <thead><tr><th>Tâche</th><th>Vol. Cumul</th><th>Unités</th></tr></thead>
                     <tbody></tbody>
                 </table>
             </div>
         </div>
 
         <div class="card">
-            <h2 style="font-size:1rem;">Détail par Ouvrier</h2>
+            <h2>Détail par Ouvrier</h2>
             <div class="table-wrapper">
                 <table id="table-detail-ouvriers">
                     <thead><tr><th>Ouvrier</th><th>Activités</th><th>Unités</th><th>Ar</th><th>Action</th></tr></thead>
                     <tbody></tbody>
                 </table>
             </div>
-            <button onclick="capturerRapport()" class="warning" style="margin-top:16px;">📸 Exporter Image</button>
+            <button onclick="capturerRapport()" class="action-btn warning" style="margin-top:20px;">📸 Exporter en Image</button>
         </div>
     </div>
 
-    <!-- ONGLET 4 : SYNCHRONISATION -->
+    <!-- ONGLET 4 : SYNC -->
     <div id="tab4" class="tab-content">
         <div class="card">
-            <h2>🔄 Gestion des Données</h2>
-            <div class="status-banner" id="sync-summary-banner" style="background:var(--card-bg); border: 2px solid var(--warning); border-left: 6px solid var(--warning);">
+            <h2>🔄 Synchronisation</h2>
+            <div class="status-banner" id="sync-summary-banner" style="background:#fff; border: 2px solid var(--warning); border-left: 6px solid var(--warning);">
                 Lignes en attente : <strong>0</strong>
             </div>
 
-            <button onclick="synchroniserDonnees()" class="primary" style="margin-bottom:16px;">📤 Envoyer vers Google Sheets</button>
-            <button onclick="chargerReferentiels()" style="background:var(--bg-color); color:var(--text-main); border: 1px solid var(--border);">📥 Mettre à jour (Tâches/Ouvriers)</button>
+            <button onclick="synchroniserDonnees()" class="action-btn primary" style="margin-bottom:16px;">📤 Envoyer vers Google Sheets</button>
+            <button onclick="chargerReferentiels()" class="action-btn" style="background:#e2e8f0; color:var(--text-main); font-weight:700;">📥 Mettre à jour les bases</button>
         </div>
     </div>
 </div>
-
-<!-- BARRE DE NAVIGATION (BOTTOM NAV) -->
-<nav class="bottom-nav">
-    <button class="nav-item active" onclick="switchTab('tab1', this)">
-        <span class="nav-icon">🔍</span>
-        <span>Recherche</span>
-    </button>
-    <button class="nav-item" id="btn-tab-saisie" onclick="switchTab('tab2', this)">
-        <span class="nav-icon">✍️</span>
-        <span>Saisie</span>
-    </button>
-    <button class="nav-item" onclick="switchTab('tab3', this)">
-        <span class="nav-icon">📊</span>
-        <span>Bilan</span>
-    </button>
-    <button class="nav-item" onclick="switchTab('tab4', this)">
-        <span class="nav-icon">🔄</span>
-        <span>Sync</span>
-    </button>
-</nav>
 
 <div id="capture-container"></div>
 
@@ -264,12 +278,7 @@
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby3to942EW3_6UaNO76a1b0LNDrTQaSRQCFhZYBewolTslE54KzIQQAwTvLVvnzZkIi-g/exec";
     const MAX_TACHES_JOUR = 2; 
     
-    let appState = {
-        taches: [],
-        ouvriers: [],
-        saisies: [],
-        activeChef: ""
-    };
+    let appState = { taches: [], ouvriers: [], saisies: [], activeChef: "" };
 
     window.onload = async () => {
         const todayStr = new Date().toISOString().split('T')[0];
@@ -280,6 +289,13 @@
         await chargerReferentiels();
         initialiserUI();
     };
+
+    function toggleSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebar-overlay');
+        sidebar.classList.toggle('open');
+        overlay.classList.toggle('open');
+    }
 
     function chargerStockageLocal() {
         appState.taches = JSON.parse(localStorage.getItem('ref_taches') || '[]');
@@ -329,14 +345,9 @@
     function initialiserUI() {
         const selectChef = document.getElementById('select-global-chef');
         selectChef.innerHTML = '';
-        
         const chefs = [...new Set(appState.ouvriers.map(o => o.chef).filter(Boolean))];
         if (chefs.length === 0) chefs.push("Aucun Chef");
-
-        chefs.forEach(chef => {
-            selectChef.innerHTML += `<option value="${chef}">${chef}</option>`;
-        });
-
+        chefs.forEach(chef => { selectChef.innerHTML += `<option value="${chef}">${chef}</option>`; });
         appState.activeChef = selectChef.options.length > 0 ? selectChef.options[0].value : "";
         onChefChange();
         rafraichirIndicateurSync();
@@ -346,12 +357,9 @@
         appState.activeChef = document.getElementById('select-global-chef').value;
         const selectOuvrier = document.getElementById('select-ouvrier');
         selectOuvrier.innerHTML = '';
-
-        const ouvriersDuChef = appState.ouvriers.filter(o => o.chef === appState.activeChef);
-        ouvriersDuChef.forEach(o => {
+        appState.ouvriers.filter(o => o.chef === appState.activeChef).forEach(o => {
             selectOuvrier.innerHTML += `<option value="${o.nom}">${o.nom}</option>`;
         });
-
         onOuvrierOrDateChange();
     }
 
@@ -359,51 +367,37 @@
         const ouvrier = document.getElementById('select-ouvrier').value;
         const date = document.getElementById('input-saisie-date').value;
         const banner = document.getElementById('worker-status-banner');
-
-        if (!ouvrier || !date) {
-            banner.innerText = "Sélectionnez un ouvrier et une date.";
-            return;
-        }
+        if (!ouvrier || !date) { banner.innerText = "Sélectionnez un ouvrier."; return; }
 
         const stats = toutTachesDuJourOuvrier(ouvrier, date);
-        const resteTaches = Math.max(0, MAX_TACHES_JOUR - stats.taches);
+        const reste = Math.max(0, MAX_TACHES_JOUR - stats.taches);
 
         banner.innerHTML = `<strong>${ouvrier}</strong><br>` +
-                           `Déjà validé : <strong>${stats.taches.toFixed(2)} / ${MAX_TACHES_JOUR} Unités</strong> (${stats.ar.toLocaleString()} Ar)<br>` +
-                           `<span style="color:var(--primary-dark);">Reste dispo : <strong>${resteTaches.toFixed(2)} Unités</strong></span>`;
+                           `Validé : <strong>${stats.taches.toFixed(2)} / ${MAX_TACHES_JOUR} Unités</strong> (${stats.ar.toLocaleString()} Ar)<br>` +
+                           `<span style="color:var(--primary-dark);">Reste dispo : <strong>${reste.toFixed(2)} Unités</strong></span>`;
         recalculerLignes();
     }
 
     function toutTachesDuJourOuvrier(ouvrier, date) {
-        let tachesCumul = 0;
-        let montantCumul = 0;
+        let t = 0, ar = 0;
         appState.saisies.forEach(s => {
-            if (s.nomOuvrier === ouvrier && s.dateTravail === date) {
-                tachesCumul += (s.taches || 0);
-                montantCumul += (s.montantAr || 0);
-            }
+            if (s.nomOuvrier === ouvrier && s.dateTravail === date) { t += (s.taches || 0); ar += (s.montantAr || 0); }
         });
-        return { taches: tachesCumul, ar: montantCumul };
+        return { taches: t, ar: ar };
     }
 
     function suggestCode(inp) {
         inp.setAttribute('data-valid', 'false');
-        
         const val = (inp.value || '').toLowerCase().trim();
         const suggestionsDiv = inp.parentElement.querySelector('.autocomplete-suggestions');
         if (!suggestionsDiv) return;
         suggestionsDiv.innerHTML = '';
-        if (!appState.taches || appState.taches.length === 0) return;
+        if (!appState.taches.length) return;
 
-        const matches = appState.taches.filter(t => {
-            const str = String(t.code + " " + t.desc).toLowerCase();
-            return !val || str.includes(val);
-        });
-
-        matches.slice(0, 10).forEach(m => {
+        appState.taches.filter(t => String(t.code + " " + t.desc).toLowerCase().includes(val)).slice(0, 10).forEach(m => {
             const div = document.createElement('div');
             div.className = 'autocomplete-suggestion';
-            div.innerHTML = `<strong>${m.code}</strong> - ${m.desc}<br><span style="color:var(--text-muted); font-size:0.8rem;">Quota: ${m.quota} ${m.unite}</span>`;
+            div.innerHTML = `<strong>${m.code}</strong> - ${m.desc}<br><span style="color:var(--text-muted); font-size:0.95rem;">Quota: ${m.quota} ${m.unite}</span>`;
             div.onclick = (e) => {
                 e.stopPropagation();
                 inp.value = `${m.code} - ${m.desc}`;
@@ -417,9 +411,7 @@
                     const res = document.getElementById('consultation-result');
                     res.style.display = 'block';
                     res.innerHTML = `Quota (1 unité) : <strong>${m.quota} ${m.unite}</strong><br>Prix : <strong>${m.prix} Ar</strong>`;
-                } else {
-                    recalculerLignes();
-                }
+                } else { recalculerLignes(); }
             };
             suggestionsDiv.appendChild(div);
         });
@@ -435,30 +427,23 @@
         const ouvrier = document.getElementById('select-ouvrier').value;
         const date = document.getElementById('input-saisie-date').value;
         if (!ouvrier || !date) return;
-
         const stats = toutTachesDuJourOuvrier(ouvrier, date);
-        const rows = document.querySelectorAll('.activity-row');
 
-        rows.forEach((row, idx) => {
+        document.querySelectorAll('.activity-row').forEach((row, idx) => {
             const quota = parseFloat(row.querySelector('.act-code').getAttribute('data-quota'));
             const hint = row.querySelector('.suggestion-hint');
-            if (isNaN(quota) || quota <= 0) {
-                hint.innerText = '';
-                return;
-            }
+            if (isNaN(quota) || quota <= 0) { hint.innerText = ''; return; }
 
             let autresFractions = 0;
-            rows.forEach((rOther, rIdx) => {
+            document.querySelectorAll('.activity-row').forEach((rOther, rIdx) => {
                 if (rIdx !== idx) {
                     const qO = parseFloat(rOther.querySelector('.act-code').getAttribute('data-quota'));
                     const rO = parseFloat(rOther.querySelector('.act-real').value);
                     if (!isNaN(qO) && qO > 0 && !isNaN(rO)) autresFractions += (rO / qO);
                 }
             });
-
-            const resteFractionsDispo = Math.max(0, MAX_TACHES_JOUR - stats.taches - autresFractions);
-            const maxQtAllowed = Math.round(resteFractionsDispo * quota * 100) / 100;
-            hint.innerHTML = `Saisie max : ${maxQtAllowed}`;
+            const maxQt = Math.round(Math.max(0, MAX_TACHES_JOUR - stats.taches - autresFractions) * quota * 100) / 100;
+            hint.innerHTML = `Max conseillé : ${maxQt}`;
         });
     }
 
@@ -467,90 +452,71 @@
         const date = document.getElementById('input-saisie-date').value;
         if (!ouvrier || !date) return alert("Sélectionnez un ouvrier et une date.");
 
-        const rows = document.querySelectorAll('.activity-row');
-        let totalFractions = 0;
-        let elements = [];
-        let erreurValidation = false;
-
-        rows.forEach(row => {
+        let totalFractions = 0, elements = [], erreur = false;
+        document.querySelectorAll('.activity-row').forEach(row => {
             const inp = row.querySelector('.act-code');
             const codeTxt = inp.value;
             const quota = parseFloat(inp.getAttribute('data-quota'));
             const prix = parseFloat(inp.getAttribute('data-prix')) || 8000;
             const real = parseFloat(row.querySelector('.act-real').value);
-            const isValid = inp.getAttribute('data-valid') === 'true';
 
-            if (codeTxt || (!isNaN(real) && real > 0)) {
-                if (!isValid) {
-                    alert(`Erreur : L'activité "${codeTxt}" n'est pas valide. Sélectionnez-la dans la liste.`);
-                    erreurValidation = true;
-                }
+            if (codeTxt && inp.getAttribute('data-valid') !== 'true') {
+                alert(`Erreur : Veuillez sélectionner "${codeTxt}" dans la liste déroulante.`);
+                erreur = true;
             }
-
-            if (!erreurValidation && codeTxt && !isNaN(quota) && quota > 0 && !isNaN(real) && real > 0) {
-                const fraction = real / quota;
-                totalFractions += fraction;
-                elements.push({ tache: codeTxt, quantite: real, quota: quota, prix: prix, fraction: fraction });
+            if (!erreur && codeTxt && !isNaN(quota) && quota > 0 && !isNaN(real) && real > 0) {
+                totalFractions += (real / quota);
+                elements.push({ tache: codeTxt, quantite: real, quota: quota, prix: prix });
             }
         });
 
-        if (erreurValidation) return;
-        if (elements.length === 0) return alert("Renseignez au moins une tâche valide.");
+        if (erreur) return;
+        if (!elements.length) return alert("Renseignez au moins une tâche valide.");
 
         const stats = toutTachesDuJourOuvrier(ouvrier, date);
         const dispo = MAX_TACHES_JOUR - stats.taches;
-        if (dispo <= 0) return alert("Cet ouvrier a déjà atteint son quota maximal.");
+        if (dispo <= 0) return alert("Quota journalier déjà atteint pour cet ouvrier.");
 
-        const ratioAjustement = totalFractions > dispo ? (dispo / totalFractions) : 1;
-
+        const ratio = totalFractions > dispo ? (dispo / totalFractions) : 1;
         elements.forEach(el => {
-            const qteAjustee = el.quantite * ratioAjustement;
-            const tachesAjustees = qteAjustee / el.quota;
-            const montantAr = Math.round(tachesAjustees * el.prix);
-
+            const qte = el.quantite * ratio;
+            const t = qte / el.quota;
             appState.saisies.push({
                 dateTravail: date, chefEquipe: appState.activeChef, nomOuvrier: ouvrier,
-                tache: el.tache, quantite: qteAjustee, taches: tachesAjustees, montantAr: montantAr, synced: false
+                tache: el.tache, quantite: qte, taches: t, montantAr: Math.round(t * el.prix), synced: false
             });
         });
 
         localStorage.setItem('saisies_hors_ligne', JSON.stringify(appState.saisies));
-        if (ratioAjustement < 1) alert("Volumes rabaissés pour respecter le plafond (2 unités).");
+        if (ratio < 1) alert("Volumes ajustés pour respecter le plafond de 2 unités.");
         
-        rows.forEach(r => {
+        document.querySelectorAll('.activity-row').forEach(r => {
             r.querySelector('.act-code').value = ''; r.querySelector('.act-real').value = '';
             r.querySelector('.act-code').setAttribute('data-valid', 'false');
             r.querySelector('.suggestion-hint').innerText = '';
         });
-
-        onOuvrierOrDateChange();
-        rafraichirIndicateurSync();
+        onOuvrierOrDateChange(); rafraichirIndicateurSync();
     }
 
     function editerSaisieOuvrier(date, ouvrier) {
         if(!confirm(`Modifier les activités de ${ouvrier} ?`)) return;
         switchTab('tab2', document.getElementById('btn-tab-saisie'));
-        
         document.getElementById('input-saisie-date').value = date;
         document.getElementById('select-ouvrier').value = ouvrier;
         
         const anc = appState.saisies.filter(s => s.dateTravail === date && s.nomOuvrier === ouvrier);
         const rows = document.querySelectorAll('.activity-row');
+        rows.forEach(r => { r.querySelector('.act-code').value = ''; r.querySelector('.act-real').value = ''; });
         
-        rows.forEach(r => {
-            r.querySelector('.act-code').value = ''; r.querySelector('.act-real').value = '';
-            r.querySelector('.act-code').setAttribute('data-valid', 'false');
+        anc.forEach((item, i) => {
+            if(rows[i]) {
+                const inp = rows[i].querySelector('.act-code');
+                const tRef = appState.taches.find(t => `${t.code} - ${t.desc}` === item.tache);
+                inp.value = item.tache; inp.setAttribute('data-valid', 'true');
+                if(tRef) { inp.setAttribute('data-quota', tRef.quota); inp.setAttribute('data-prix', tRef.prix); }
+                rows[i].querySelector('.act-real').value = item.quantite;
+            }
         });
-        
-        for(let i=0; i<Math.min(anc.length, rows.length); i++) {
-            const inputCode = rows[i].querySelector('.act-code');
-            const tRef = appState.taches.find(t => `${t.code} - ${t.desc}` === anc[i].tache);
-            inputCode.value = anc[i].tache;
-            inputCode.setAttribute('data-valid', 'true');
-            if(tRef) { inputCode.setAttribute('data-quota', tRef.quota); inputCode.setAttribute('data-prix', tRef.prix); }
-            rows[i].querySelector('.act-real').value = anc[i].quantite;
-        }
-
         appState.saisies = appState.saisies.filter(s => !(s.dateTravail === date && s.nomOuvrier === ouvrier));
         localStorage.setItem('saisies_hors_ligne', JSON.stringify(appState.saisies));
         onOuvrierOrDateChange(); rafraichirIndicateurSync();
@@ -563,14 +529,12 @@
         tbodyG.innerHTML = ''; tbodyD.innerHTML = '';
 
         const dataJour = appState.saisies.filter(s => s.dateTravail === d);
-        if (dataJour.length === 0) return;
+        if (!dataJour.length) return;
 
         let recap = {}, details = {};
-
         dataJour.forEach(s => {
             if (!recap[s.tache]) recap[s.tache] = { q:0, t:0 };
             recap[s.tache].q += s.quantite; recap[s.tache].t += s.taches;
-
             if (!details[s.nomOuvrier]) details[s.nomOuvrier] = { acts: [], totTaches:0, totAr:0 };
             details[s.nomOuvrier].acts.push(`${s.tache} : ${s.quantite.toFixed(2)}`);
             details[s.nomOuvrier].totTaches += s.taches; details[s.nomOuvrier].totAr += s.montantAr;
@@ -580,14 +544,14 @@
             tbodyG.innerHTML += `<tr><td>${t}</td><td>${v.q.toFixed(2)}</td><td>${v.t.toFixed(2)}</td></tr>`;
         }
         for (const [o, v] of Object.entries(details)) {
-            tbodyD.innerHTML += `<tr><td>${o}</td><td style="white-space:pre-wrap;font-size:0.8rem;">${v.acts.join('\n')}</td><td>${v.totTaches.toFixed(2)}</td><td>${v.totAr.toLocaleString()}</td><td>${dataJour.find(x => x.nomOuvrier === o && x.synced) ? '✅' : `<button onclick="editerSaisieOuvrier('${d}', '${o}')" style="padding:6px; font-size:0.8rem; background:var(--bg-color); color:var(--text-main);">Éditer</button>`}</td></tr>`;
+            tbodyD.innerHTML += `<tr><td><strong>${o}</strong></td><td style="white-space:pre-wrap;">${v.acts.join('<br>')}</td><td>${v.totTaches.toFixed(2)}</td><td>${v.totAr.toLocaleString()}</td><td>${dataJour.find(x => x.nomOuvrier === o && x.synced) ? '✅' : `<button onclick="editerSaisieOuvrier('${d}', '${o}')" style="padding:8px 12px; font-size:0.9rem; background:#e2e8f0; color:var(--text-main);">Modifier</button>`}</td></tr>`;
         }
     }
 
     async function synchroniserDonnees() {
         if (!navigator.onLine) return alert("Pas de connexion internet.");
         const aSync = appState.saisies.filter(s => !s.synced);
-        if (aSync.length === 0) return alert("Tout est déjà synchronisé !");
+        if (!aSync.length) return alert("Tout est déjà synchronisé !");
         updateSyncBadge("🔄 Envoi...", "var(--warning)");
 
         try {
@@ -596,17 +560,16 @@
             localStorage.setItem('saisies_hors_ligne', JSON.stringify(appState.saisies));
             updateSyncBadge("🟢 Connecté", "var(--success)");
             rafraichirIndicateurSync(); rafraichirRapports();
-            alert("✅ Données synchronisées !");
+            alert("✅ Données synchronisées avec succès !");
         } catch (e) {
             updateSyncBadge("🔴 Erreur", "var(--danger)");
-            alert("Erreur réseau. Réessayez plus tard.");
+            alert("Erreur réseau.");
         }
     }
 
     function rafraichirIndicateurSync() {
         const nb = appState.saisies.filter(s => !s.synced).length;
         document.getElementById('sync-summary-banner').innerHTML = `Lignes en attente réseau : <strong>${nb}</strong>`;
-        document.getElementById('sync-summary-banner').style.borderColor = nb > 0 ? "var(--warning)" : "var(--success)";
     }
 
     function switchTab(tabId, btn) {
@@ -614,12 +577,12 @@
         document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
         document.getElementById(tabId).classList.add('active');
         btn.classList.add('active');
-        
-        // Cacher la sélection du chef d'équipe sur l'onglet de synchronisation
         document.getElementById('global-context-card').style.display = (tabId === 'tab4') ? 'none' : 'block';
-        
         if (tabId === 'tab3') rafraichirRapports();
-        window.scrollTo(0, 0); // Remonter en haut de page lors du changement d'onglet
+        
+        // Ferme le menu latéral automatiquement sur mobile après sélection
+        toggleSidebar();
+        window.scrollTo(0, 0);
     }
 
     function updateSyncBadge(txt, color) {
@@ -630,14 +593,14 @@
     function capturerRapport() {
         const d = document.getElementById('report-date').value;
         const cont = document.getElementById('capture-container');
-        cont.innerHTML = `<div style="font-family:sans-serif;">
+        cont.innerHTML = `<div style="font-family:sans-serif; font-size:1.1rem;">
             <h1 style="color:#1e40af;text-align:center;">CANOPY ENERGY</h1>
             <h3 style="text-align:center;">Bilan: ${d} | Chef: ${appState.activeChef}</h3>
             ${document.getElementById('tab3').innerHTML.replace(/<button.*?>.*?<\/button>/g, '')}
         </div>`;
         html2canvas(cont).then(canvas => {
             const link = document.createElement('a');
-            link.download = `Canopy_Rapport_${d}_${appState.activeChef.replace(/\s+/g,'_')}.png`;
+            link.download = `Canopy_Rapport_${d}.png`;
             link.href = canvas.toDataURL("image/png"); link.click();
             cont.innerHTML = '';
         });
