@@ -228,19 +228,23 @@
                     <input type="date" id="input-saisie-date" onchange="onOuvrierOrDateChange()" class="large-touch">
                 </div>
                 <div class="form-group">
-                    <label>📍 Projet / Parcelle</label>
-                    <input type="text" id="input-saisie-projet" placeholder="Ex: Lot 2" onchange="onOuvrierOrDateChange()" class="large-touch">
+                    <label>📍 Projet</label>
+                    <input type="text" id="input-saisie-projet" placeholder="Ex: Canopy" class="large-touch">
                 </div>
             </div>
             <div class="form-row">
                 <div class="form-group">
+                    <label>🗺️ Parcelle</label>
+                    <input type="text" id="input-saisie-parcelle" placeholder="Ex: Lot 2" class="large-touch">
+                </div>
+                <div class="form-group">
                     <label>👥 Équipe</label>
                     <select id="select-global-chef" onchange="onChefChange()" class="large-touch"></select>
                 </div>
-                <div class="form-group">
-                    <label>👷‍♂️ Ouvrier</label>
-                    <select id="select-ouvrier" onchange="onOuvrierOrDateChange()" class="large-touch"></select>
-                </div>
+            </div>
+            <div class="form-group">
+                <label>👷‍♂️ Ouvrier</label>
+                <select id="select-ouvrier" onchange="onOuvrierOrDateChange()" class="large-touch"></select>
             </div>
             <div id="worker-status-banner" class="status-banner">Veuillez sélectionner un ouvrier.</div>
         </div>
@@ -306,7 +310,7 @@
             </div>
         </div>
 
-        <!-- NOUVELLE SECTION : SYNTHÈSE PAR TÂCHE -->
+        <!-- SECTION : SYNTHÈSE PAR TÂCHE -->
         <div class="card">
             <h2>📈 Synthèse par Tâche saisie</h2>
             <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:10px;">Récapitulatif des effectifs et réalisations totales pour la période filtrée.</p>
@@ -324,7 +328,7 @@
             </div>
         </div>
 
-        <!-- NOUVELLE SECTION : ÉDITION DES SAISIES -->
+        <!-- SECTION : ÉDITION DES SAISIES -->
         <div class="card">
             <h2>✏️ Détail et Édition des saisies</h2>
             <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:14px;">Les lignes non synchronisées peuvent être modifiées ou supprimées. Les lignes synchronisées 🔒 sont définitives.</p>
@@ -441,15 +445,18 @@
         appState.lastError = localStorage.getItem('last_sync_error') || null;
     }
 
+    // Gère la transition vers les nouveaux champs Projet et Parcelle séparés
     function migrerAnciennesDonneesLocales() {
         let modifie = false;
         appState.saisies = appState.saisies.map(record => {
-            if (!record.projet || !record.parcelle || !record.timestamp || record.syncStatus === undefined || !record.id) {
+            if (record.parcelle === undefined || !record.timestamp || record.synced === undefined || !record.id) {
                 modifie = true;
                 return {
                     id: record.id || ('S_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4)),
                     dateTravail: record.dateTravail || new Date().toISOString().split('T')[0],
-                    projetParcelle: record.projetParcelle || record.parcelle || "Canopy",
+                    projetParcelle: record.projetParcelle || record.projet || "Canopy", // Conservation pour rétrocompatibilité backend
+                    projet: record.projet || record.projetParcelle || "Canopy",
+                    parcelle: record.parcelle || "",
                     chefEquipe: record.chefEquipe || record.equipe || "Non défini",
                     nomOuvrier: record.nomOuvrier || record.ouvrier || "Inconnu",
                     tache: record.tache || record.activite || "Tâche générale",
@@ -649,6 +656,8 @@
         const ouvrier = document.getElementById('select-ouvrier').value;
         const date = document.getElementById('input-saisie-date').value;
         const projet = document.getElementById('input-saisie-projet').value.trim() || "Non spécifié";
+        const parcelle = document.getElementById('input-saisie-parcelle').value.trim() || "";
+        
         if (!ouvrier || !date) {
             showToast("Sélectionnez un ouvrier et une date.", "error");
             return;
@@ -693,7 +702,9 @@
             appState.saisies.push({
                 id: 'S_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
                 dateTravail: date, 
-                projetParcelle: projet, 
+                projetParcelle: projet, // Rétrocompatibilité avec d'anciens codes
+                projet: projet, 
+                parcelle: parcelle, 
                 chefEquipe: appState.activeChef, 
                 nomOuvrier: ouvrier,
                 tache: el.tache, 
@@ -785,8 +796,9 @@
             sel.value = val || "";
         };
 
-        peupleSelect('filter-projet', [...new Set(appState.saisies.map(s => s.projetParcelle).filter(Boolean))], "Tous les projets");
-        peupleSelect('filter-parcelle', [...new Set(appState.saisies.map(s => s.projetParcelle).filter(Boolean))], "Toutes les parcelles");
+        // Séparation des filtres Projet et Parcelle
+        peupleSelect('filter-projet', [...new Set(appState.saisies.map(s => s.projet || s.projetParcelle).filter(Boolean))], "Tous les projets");
+        peupleSelect('filter-parcelle', [...new Set(appState.saisies.map(s => s.parcelle).filter(Boolean))], "Toutes les parcelles");
         peupleSelect('filter-equipe', [...new Set(appState.ouvriers.map(o => o.chef).filter(Boolean))], "Toutes les équipes");
         peupleSelect('filter-ouvrier', [...new Set(appState.ouvriers.map(o => o.nom).filter(Boolean))], "Tous les ouvriers");
         peupleSelect('filter-activite', [...new Set(appState.saisies.map(s => s.tache).filter(Boolean))], "Toutes les activités");
@@ -804,8 +816,9 @@
         const fData = appState.saisies.filter(s => {
             let pass = true;
             if (s.dateTravail < start || s.dateTravail > end) pass = false;
-            if (fProjet && s.projetParcelle !== fProjet) pass = false;
-            if (fParcelle && s.projetParcelle !== fParcelle) pass = false;
+            // Vérification sur projet et parcelle séparés
+            if (fProjet && (s.projet || s.projetParcelle) !== fProjet) pass = false;
+            if (fParcelle && s.parcelle !== fParcelle) pass = false;
             if (fEquipe && s.chefEquipe !== fEquipe) pass = false;
             if (fOuvrier && s.nomOuvrier !== fOuvrier) pass = false;
             if (fActivite && s.tache !== fActivite) pass = false;
@@ -864,7 +877,7 @@
                         </span>
                     </div>
                     <div style="font-size:0.8rem; color:var(--text-muted); margin-bottom:12px; line-height:1.4;">
-                        📅 ${s.dateTravail} | 📍 ${s.projetParcelle} <br>
+                        📅 ${s.dateTravail} | 📍 Projet: ${s.projet || s.projetParcelle} | 🗺️ Parcelle: ${s.parcelle || '-'} <br>
                         📋 <strong>${s.tache}</strong>
                     </div>
                 `;
