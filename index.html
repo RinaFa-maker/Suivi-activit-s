@@ -13,11 +13,11 @@
     
     <style>
         :root {
-            --primary: #14532d;         /* Vert forêt profond */
+            --primary: #14532d;
             --primary-hover: #166534;
             --primary-light: #dcfce7;
             --primary-muted: #bbf7d0;
-            --accent: #22c55e;          /* Vert dynamique */
+            --accent: #22c55e;
 
             --bg-app: #f8fafc;
             --bg-card: #ffffff;
@@ -135,9 +135,14 @@
         input:focus, select:focus { border-color: var(--border-focus); box-shadow: 0 0 0 3px rgba(20, 83, 45, 0.12); }
         .large-touch { min-height: 52px; }
         
-        .activity-row { background: var(--bg-app); border: 1.5px solid var(--border); border-radius: var(--radius-md); padding: 14px; margin-bottom: 12px; }
+        .activity-row { background: var(--bg-app); border: 1.5px solid var(--border); border-radius: var(--radius-md); padding: 14px; margin-bottom: 12px; transition: border-color 0.2s; }
         .activity-row-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding-bottom: 6px; border-bottom: 1px solid var(--border); }
         .activity-row-title { font-size: 0.8rem; font-weight: 800; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px; }
+        
+        .btn-small { min-height: 44px; padding: 0 16px; border-radius: var(--radius-sm); border: none; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .btn-edit { background: var(--primary); color: white; }
+        .btn-delete { background: var(--error-light); color: var(--error); border: 1px solid var(--error); }
+        
         .remove-btn { background: var(--error-light); color: var(--error); border: none; border-radius: var(--radius-sm); width: 40px; height: 40px; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; cursor: pointer; }
         .relative-wrapper { position: relative; }
         .autocomplete-suggestions { position: absolute; top: 100%; left: 0; right: 0; background: #ffffff; border: 2px solid var(--primary); border-radius: var(--radius-sm); margin-top: 4px; max-height: 220px; overflow-y: auto; z-index: 1000; box-shadow: var(--shadow-md); }
@@ -163,11 +168,6 @@
         .stat-value { font-size: 1.4rem; font-weight: 900; color: var(--primary); }
         .stat-label { font-size: 0.75rem; color: var(--text-muted); font-weight: 800; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
 
-        .progress-item { margin-bottom: 14px; }
-        .progress-header { display: flex; justify-content: space-between; font-size: 0.85rem; font-weight: 800; margin-bottom: 6px; color: var(--text-main); }
-        .progress-track { background: var(--border); height: 14px; border-radius: 7px; overflow: hidden; }
-        .progress-fill { background: var(--accent); height: 100%; border-radius: 7px; transition: width 0.5s ease-out; }
-
         .filters-group { display: flex; flex-direction: column; gap: 10px; margin-bottom: 14px; }
         .filters-group select, .filters-group input { padding: 10px 12px; font-size: 0.85rem; min-height: 44px; }
         .filters-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
@@ -175,11 +175,16 @@
         .toast-notification { position: fixed; bottom: 85px; left: 50%; transform: translateX(-50%) translateY(150px); background: var(--success); color: white; padding: 14px 20px; border-radius: 30px; font-weight: 800; font-size: 0.95rem; box-shadow: 0 8px 20px rgba(0,0,0,0.2); transition: transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 1000; display: flex; align-items: center; gap: 10px; width: 90%; max-width: 380px; justify-content: center; }
         .toast-notification.show { transform: translateX(-50%) translateY(0); }
 
-        .table-wrapper { overflow-x: auto; border-radius: var(--radius-sm); border: 1px solid var(--border); }
+        .table-wrapper { overflow-x: auto; border-radius: var(--radius-sm); border: 1px solid var(--border); margin-bottom: 14px; }
         table { width: 100%; border-collapse: collapse; background: #fff; }
-        th, td { padding: 10px 12px; text-align: left; font-size: 0.85rem; border-bottom: 1px solid var(--border); white-space: nowrap; }
+        th, td { padding: 12px; text-align: left; font-size: 0.85rem; border-bottom: 1px solid var(--border); white-space: nowrap; }
         th { background: #f1f5f9; color: var(--text-main); font-weight: 800; }
+        td strong { color: var(--primary); }
         
+        .status-badge { padding: 4px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: 700; display: inline-block; }
+        .status-success { background: var(--success-light); color: var(--success); }
+        .status-warning { background: var(--warning-light); color: var(--warning); }
+
         .tab-content { display: none; }
         .tab-content.active { display: block; }
         .search-drawer { margin-bottom: 14px; background: #ffffff; border: 1.5px dashed var(--primary); border-radius: var(--radius-md); padding: 12px; }
@@ -252,7 +257,7 @@
         </div>
     </div>
 
-    <!-- TAB 2 : TABLEAU DE BORD AVANCÉ -->
+    <!-- TAB 2 : TABLEAU DE BORD AVANCÉ & ÉDITION -->
     <div id="tab-dashboard" class="tab-content">
         
         <div class="card">
@@ -301,15 +306,36 @@
             </div>
         </div>
 
+        <!-- NOUVELLE SECTION : SYNTHÈSE PAR TÂCHE -->
         <div class="card">
-            <h2>📈 Activités de la période</h2>
-            <div id="activites-progress-container">
-                <p style="color:var(--text-muted); font-size:0.85rem;">Aucune activité sur cette période.</p>
+            <h2>📈 Synthèse par Tâche saisie</h2>
+            <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:10px;">Récapitulatif des effectifs et réalisations totales pour la période filtrée.</p>
+            <div class="table-wrapper">
+                <table id="table-synthese-taches">
+                    <thead>
+                        <tr>
+                            <th>Tâche</th>
+                            <th>Effectif</th>
+                            <th>Réalisation</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tb-synthese-taches"></tbody>
+                </table>
             </div>
         </div>
 
+        <!-- NOUVELLE SECTION : ÉDITION DES SAISIES -->
         <div class="card">
-            <h2>🏆 Performance par Ouvrier</h2>
+            <h2>✏️ Détail et Édition des saisies</h2>
+            <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:14px;">Les lignes non synchronisées peuvent être modifiées ou supprimées. Les lignes synchronisées 🔒 sont définitives.</p>
+            
+            <div id="liste-edition-saisies">
+                <!-- Généré via JS -->
+            </div>
+        </div>
+
+        <div class="card" style="margin-bottom: 24px;">
+            <h2>🏆 Performance Individuelle (Export)</h2>
             <div class="table-wrapper">
                 <table id="table-performance">
                     <thead>
@@ -415,11 +441,10 @@
         appState.lastError = localStorage.getItem('last_sync_error') || null;
     }
 
-    // Migration douce pour assurer la compatibilité des anciennes données
     function migrerAnciennesDonneesLocales() {
         let modifie = false;
         appState.saisies = appState.saisies.map(record => {
-            if (!record.projet || !record.parcelle || !record.timestamp || record.syncStatus === undefined) {
+            if (!record.projet || !record.parcelle || !record.timestamp || record.syncStatus === undefined || !record.id) {
                 modifie = true;
                 return {
                     id: record.id || ('S_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4)),
@@ -475,7 +500,7 @@
                 initDashboardFilters();
             }
         } catch (e) {
-            // Utilisation du cache local en cas de panne réseau
+            // Utilisation cache local
         } finally {
             rafraichirEtatSync();
         }
@@ -666,7 +691,7 @@
             const qte = el.quantite * ratio;
             const t = qte / el.quota;
             appState.saisies.push({
-                id: 'S_' + Date.now + '_' + Math.random().toString(36).substr(2, 5),
+                id: 'S_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
                 dateTravail: date, 
                 projetParcelle: projet, 
                 chefEquipe: appState.activeChef, 
@@ -775,6 +800,7 @@
         const fOuvrier = document.getElementById('filter-ouvrier').value;
         const fActivite = document.getElementById('filter-activite').value;
 
+        // FILTRAGE PRINCIPAL
         const fData = appState.saisies.filter(s => {
             let pass = true;
             if (s.dateTravail < start || s.dateTravail > end) pass = false;
@@ -786,53 +812,82 @@
             return pass;
         });
 
-        const ouvriersUniques = new Set(fData.map(s => s.nomOuvrier)).size;
-        const totalActivites = fData.length;
-        const totalPlants = fData.filter(s => s.tache.toLowerCase().includes('plant')).reduce((sum, s) => sum + s.quantite, 0);
-        const totalUnites = fData.reduce((sum, s) => sum + (s.taches || 0), 0);
+        // MISE À JOUR DES KPIs
+        document.getElementById('kpi-ouvriers').innerText = new Set(fData.map(s => s.nomOuvrier)).size;
+        document.getElementById('kpi-activites').innerText = fData.length;
+        document.getElementById('kpi-plants').innerText = Math.round(fData.filter(s => s.tache.toLowerCase().includes('plant')).reduce((sum, s) => sum + s.quantite, 0)).toLocaleString();
+        document.getElementById('kpi-total').innerText = fData.reduce((sum, s) => sum + (s.taches || 0), 0).toFixed(2);
 
-        document.getElementById('kpi-ouvriers').innerText = ouvriersUniques;
-        document.getElementById('kpi-activites').innerText = totalActivites;
-        document.getElementById('kpi-plants').innerText = Math.round(totalPlants).toLocaleString();
-        document.getElementById('kpi-total').innerText = totalUnites.toFixed(2);
-
-        const actContainer = document.getElementById('activites-progress-container');
-        actContainer.innerHTML = '';
-        if (fData.length === 0) {
-            actContainer.innerHTML = '<p style="color:var(--text-muted); font-size:0.85rem;">Aucune activité sur cette période.</p>';
-            document.getElementById('th-performance').innerHTML = '';
-            document.getElementById('tb-performance').innerHTML = '<tr><td colspan="100%">Aucune donnée.</td></tr>';
-            return;
-        }
-
-        let taskTotals = {};
+        // 1. SYNTHÈSE PAR TÂCHE
+        let syntheseTaches = {};
         fData.forEach(s => {
             let shortName = s.tache.split(' - ')[0];
-            taskTotals[shortName] = (taskTotals[shortName] || 0) + s.quantite;
+            if (!syntheseTaches[shortName]) {
+                syntheseTaches[shortName] = { ouvriers: new Set(), quantite: 0, nomComplet: s.tache };
+            }
+            syntheseTaches[shortName].ouvriers.add(s.nomOuvrier);
+            syntheseTaches[shortName].quantite += s.quantite;
         });
 
-        const sortedTasksArr = Object.entries(taskTotals).sort((a,b) => b[1] - a[1]);
-        const maxQte = sortedTasksArr[0][1] || 1;
-
-        sortedTasksArr.forEach(([tName, qte]) => {
-            const percentage = Math.min(100, (qte / maxQte) * 100);
-            actContainer.innerHTML += `
-                <div class="progress-item">
-                    <div class="progress-header">
-                        <span>${tName}</span>
-                        <span>${qte.toFixed(1).replace(/\.0$/, '')}</span>
-                    </div>
-                    <div class="progress-track">
-                        <div class="progress-fill" style="width: ${percentage}%"></div>
-                    </div>
-                </div>
-            `;
-        });
-
-        const topTasksNames = sortedTasksArr.slice(0, 4).map(t => t[0]);
+        let tbSynthese = '';
+        const sortedTasksArr = Object.entries(syntheseTaches).sort((a,b) => b[1].quantite - a[1].quantite);
         
+        sortedTasksArr.forEach(([code, data]) => {
+            tbSynthese += `<tr>
+                <td title="${data.nomComplet}"><strong>${code}</strong></td>
+                <td>${data.ouvriers.size} 👷</td>
+                <td><strong>${data.quantite.toFixed(2).replace(/\.00$/, '')}</strong></td>
+            </tr>`;
+        });
+        if(!tbSynthese) tbSynthese = '<tr><td colspan="3">Aucune donnée sur cette période.</td></tr>';
+        document.getElementById('tb-synthese-taches').innerHTML = tbSynthese;
+
+        // 2. DÉTAIL ET ÉDITION DES SAISIES
+        const divEdition = document.getElementById('liste-edition-saisies');
+        divEdition.innerHTML = '';
+        
+        if (fData.length === 0) {
+            divEdition.innerHTML = '<p style="color:var(--text-muted); font-size:0.9rem;">Aucune saisie à afficher.</p>';
+        } else {
+            // Afficher de la plus récente à la plus ancienne
+            const sortedSaisies = [...fData].sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp));
+            
+            sortedSaisies.forEach(s => {
+                const isSynced = s.synced;
+                
+                let cardHTML = `
+                <div class="activity-row" style="margin-bottom:12px; border-color: ${isSynced ? 'var(--border)' : 'var(--warning)'}; border-left-width: 4px; border-left-color: ${isSynced ? 'var(--success)' : 'var(--warning)'};">
+                    <div style="display:flex; justify-content:space-between; margin-bottom:8px; align-items:center;">
+                        <strong style="font-size:0.95rem; color:var(--text-main);">${s.nomOuvrier}</strong>
+                        <span class="status-badge ${isSynced ? 'status-success' : 'status-warning'}">
+                            ${isSynced ? '🔒 Synchro' : '⏳ Attente'}
+                        </span>
+                    </div>
+                    <div style="font-size:0.8rem; color:var(--text-muted); margin-bottom:12px; line-height:1.4;">
+                        📅 ${s.dateTravail} | 📍 ${s.projetParcelle} <br>
+                        📋 <strong>${s.tache}</strong>
+                    </div>
+                `;
+
+                if (isSynced) {
+                    cardHTML += `<div style="font-weight:800; font-size:1rem; color:var(--primary);">Réalisation : ${s.quantite}</div>`;
+                } else {
+                    cardHTML += `
+                    <div style="display:flex; gap:8px; align-items:center;">
+                        <input type="number" id="edit-qte-${s.id}" value="${s.quantite}" class="large-touch" style="flex:1; min-height:44px; padding:10px;" step="any" min="0">
+                        <button onclick="mettreAJourSaisie('${s.id}')" class="btn-small btn-edit" title="Enregistrer">💾</button>
+                        <button onclick="supprimerSaisie('${s.id}')" class="btn-small btn-delete" title="Supprimer">🗑️</button>
+                    </div>`;
+                }
+                cardHTML += `</div>`;
+                divEdition.innerHTML += cardHTML;
+            });
+        }
+
+        // 3. TABLEAU CROISÉ (PERFORMANCE INDIVIDUELLE)
+        const topTasksNames = sortedTasksArr.slice(0, 4).map(t => t[0]);
         let thHTML = `<th>Ouvrier</th>`;
-        topTasksNames.forEach(t => thHTML += `<th>${t.substring(0,8)}...</th>`);
+        topTasksNames.forEach(t => thHTML += `<th>${t.substring(0,8)}</th>`);
         thHTML += `<th>Autres</th><th>Total U.</th>`;
         document.getElementById('th-performance').innerHTML = thHTML;
 
@@ -861,7 +916,69 @@
             tbHTML += `<td>${autresQte > 0 ? autresQte.toFixed(1).replace(/\.0$/, '') : '-'}</td>`;
             tbHTML += `<td><strong>${ouvrierData[ouvrier].totalU.toFixed(2)}</strong></td></tr>`;
         }
-        document.getElementById('tb-performance').innerHTML = tbHTML;
+        document.getElementById('tb-performance').innerHTML = tbHTML || '<tr><td colspan="100%">Aucune donnée.</td></tr>';
+    }
+
+    // FONCTIONS D'ÉDITION DES SAISIES NON-SYNCHRONISÉES
+    function mettreAJourSaisie(id) {
+        const index = appState.saisies.findIndex(s => s.id === id);
+        if (index === -1) return;
+        
+        const saisie = appState.saisies[index];
+        if (saisie.synced) {
+            showToast("Impossible de modifier une donnée synchronisée.", "error");
+            return;
+        }
+
+        const inputQte = document.getElementById(`edit-qte-${id}`);
+        const newQte = parseFloat(inputQte.value);
+
+        if (isNaN(newQte) || newQte <= 0) {
+            showToast("Quantité invalide.", "error");
+            return;
+        }
+
+        // Déduction robuste du quota et prix d'origine
+        let quota = saisie.quantite / saisie.taches; 
+        if (isNaN(quota) || quota <= 0) {
+            const ref = appState.taches.find(t => saisie.tache.startsWith(t.code));
+            quota = ref ? ref.quota : 1;
+        }
+        let prix = saisie.montantAr / saisie.taches;
+        if (isNaN(prix) || prix <= 0) {
+            const ref = appState.taches.find(t => saisie.tache.startsWith(t.code));
+            prix = ref ? ref.prix : 8000;
+        }
+
+        // Mise à jour de l'enregistrement
+        saisie.quantite = newQte;
+        saisie.taches = newQte / quota;
+        saisie.montantAr = Math.round(saisie.taches * prix);
+
+        localStorage.setItem('saisies_hors_ligne', JSON.stringify(appState.saisies));
+        showToast("Saisie mise à jour ✅", "success");
+        
+        rafraichirDashboard();
+        rafraichirEtatSync();
+    }
+
+    function supprimerSaisie(id) {
+        const index = appState.saisies.findIndex(s => s.id === id);
+        if (index === -1) return;
+        
+        if (appState.saisies[index].synced) {
+            showToast("Impossible de supprimer une donnée synchronisée.", "error");
+            return;
+        }
+
+        if (!confirm("Voulez-vous vraiment supprimer cette ligne de réalisation ?")) return;
+
+        appState.saisies.splice(index, 1);
+        localStorage.setItem('saisies_hors_ligne', JSON.stringify(appState.saisies));
+        showToast("Saisie supprimée 🗑️", "success");
+        
+        rafraichirDashboard();
+        rafraichirEtatSync();
     }
 
     function rafraichirEtatSync() {
@@ -890,7 +1007,6 @@
             btnSync.disabled = (pendingCount === 0 || appState.isSyncing || !isOnline);
         }
 
-        const badge = document.getElementById('sync-status');
         if (appState.isSyncing) {
             setSyncBadge("🔵 Synchro en cours...", "var(--info)", "var(--info-light)");
         } else if (appState.lastError && pendingCount > 0) {
