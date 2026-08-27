@@ -13,23 +13,21 @@
     
     <style>
         :root {
-            /* Palette Agroforesterie */
             --bg-color: #f4f6f8;
             --card-bg: #ffffff;
-            --primary: #1b4332;         /* Vert forêt principal */
-            --primary-mid: #2d6a4f;     /* Vert moyen */
-            --primary-light: #e8f5e9;   /* Vert clair d'accentuation */
-            --accent: #52b788;          /* Vert secondaire */
+            --primary: #1b4332;         
+            --primary-mid: #2d6a4f;     
+            --primary-light: #e8f5e9;   
+            --accent: #52b788;          
             
             --text-main: #1e293b;
             --text-muted: #64748b;
             --border: #cbd5e1;
             
-            /* Statuts stricts */
-            --success: #16a34a;         /* Vert validation */
-            --warning: #d97706;         /* Orange uniquement pour avertissements */
-            --danger: #dc2626;          /* Rouge uniquement pour erreurs */
-            --info: #2563eb;            /* Bleu pour synchro en cours */
+            --success: #16a34a;         
+            --warning: #d97706;         
+            --danger: #dc2626;          
+            --info: #2563eb;            
             
             --radius: 14px;
             --shadow: 0 4px 12px rgba(0,0,0,0.05);
@@ -50,10 +48,9 @@
             min-height: 100vh; 
             display: flex; 
             flex-direction: column; 
-            padding-bottom: 76px; /* Espace pour la navigation fixe inférieure */
+            padding-bottom: 76px; 
         }
         
-        /* EN-TÊTE FIXE */
         header { 
             background: var(--primary); 
             color: white; 
@@ -67,23 +64,9 @@
             box-shadow: 0 2px 8px rgba(0,0,0,0.15); 
         }
         
-        .header-brand { 
-            display: flex; 
-            flex-direction: column; 
-        }
-        
-        .brand-logo { 
-            font-size: 1.15rem; 
-            font-weight: 800; 
-            letter-spacing: -0.3px;
-            color: #ffffff;
-        }
-        
-        .brand-subtitle { 
-            font-size: 0.82rem; 
-            opacity: 0.85; 
-            font-weight: 500; 
-        }
+        .header-brand { display: flex; flex-direction: column; }
+        .brand-logo { font-size: 1.15rem; font-weight: 800; letter-spacing: -0.3px; color: #ffffff; }
+        .brand-subtitle { font-size: 0.82rem; opacity: 0.85; font-weight: 500; }
         
         .sync-badge { 
             font-size: 0.85rem; 
@@ -91,18 +74,13 @@
             border-radius: 20px; 
             background: rgba(255,255,255,0.15); 
             font-weight: 700; 
-            display: flex;
-            align-items: center;
-            gap: 6px;
+            display: flex; align-items: center; gap: 6px; 
             transition: all 0.3s ease;
         }
 
-        /* NAVIGATION INFÉRIEURE FIXE (MOBILE-FIRST) */
         .bottom-nav {
             position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
+            bottom: 0; left: 0; right: 0;
             height: 68px;
             background: #ffffff;
             border-top: 1px solid var(--border);
@@ -114,365 +92,84 @@
         }
 
         .nav-button {
-            flex: 1;
-            height: 100%;
-            background: transparent;
-            border: none;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            gap: 4px;
-            color: var(--text-muted);
-            font-size: 0.75rem;
-            font-weight: 700;
-            cursor: pointer;
+            flex: 1; height: 100%; background: transparent; border: none;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            gap: 4px; color: var(--text-muted); font-size: 0.75rem; font-weight: 700; cursor: pointer;
         }
+        .nav-button .nav-icon { font-size: 1.4rem; }
+        .nav-button.active { color: var(--primary); background: var(--primary-light); border-top: 3px solid var(--primary); }
 
-        .nav-button .nav-icon {
-            font-size: 1.4rem;
-        }
+        .container { padding: 16px; max-width: 800px; margin: 0 auto; width: 100%; flex: 1; }
+        .card { background: var(--card-bg); border-radius: var(--radius); padding: 18px; margin-bottom: 16px; box-shadow: var(--shadow); border: 1px solid rgba(0,0,0,0.03); }
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+        .card h2 { font-size: 1.25rem; color: var(--primary); display: flex; align-items: center; gap: 8px; font-weight: 800; margin-bottom:14px; }
 
-        .nav-button.active {
-            color: var(--primary);
-            background: var(--primary-light);
-            border-top: 3px solid var(--primary);
-        }
-
-        /* CONTENEUR ET CARTES */
-        .container { 
-            padding: 16px; 
-            max-width: 800px; 
-            margin: 0 auto; 
-            width: 100%; 
-            flex: 1; 
-        }
-
-        .card { 
-            background: var(--card-bg); 
-            border-radius: var(--radius); 
-            padding: 18px; 
-            margin-bottom: 16px; 
-            box-shadow: var(--shadow); 
-            border: 1px solid rgba(0,0,0,0.03);
-        }
-
-        .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 14px;
-        }
-
-        .card h2 { 
-            font-size: 1.25rem; 
-            color: var(--primary); 
-            display: flex; 
-            align-items: center; 
-            gap: 8px; 
-            font-weight: 800; 
-        }
-
-        /* FORMULAIRES DE SAISIE & OPTIMISATION TACTILE */
-        .form-group { 
-            margin-bottom: 14px; 
-        }
-        
-        .form-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-        }
-
-        label { 
-            display: block; 
-            margin-bottom: 6px; 
-            font-weight: 700; 
-            font-size: 0.9rem; 
-            color: var(--text-main); 
-        }
+        .form-group { margin-bottom: 14px; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        label { display: block; margin-bottom: 6px; font-weight: 700; font-size: 0.9rem; color: var(--text-main); }
         
         input, select { 
-            width: 100%; 
-            padding: 14px; 
-            border: 1.5px solid var(--border); 
-            border-radius: 10px; 
-            font-size: 1rem; 
-            background: #ffffff; 
-            color: var(--text-main); 
-            outline: none; 
-            appearance: none; 
-            font-weight: 600; 
-            transition: border-color 0.2s, box-shadow 0.2s;
+            width: 100%; padding: 14px; border: 1.5px solid var(--border); border-radius: 10px; 
+            font-size: 1rem; background: #ffffff; color: var(--text-main); outline: none; 
+            appearance: none; font-weight: 600; transition: border-color 0.2s, box-shadow 0.2s;
         }
-
-        input:focus, select:focus { 
-            border-color: var(--primary-mid); 
-            box-shadow: 0 0 0 3px rgba(45, 106, 79, 0.15); 
-        }
-
-        .large-touch {
-            min-height: 54px; /* Hauteur minimale recommandée pour le tactile */
-        }
-
-        .focus-highlight:focus {
-            border-color: var(--success);
-            box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.2);
-        }
+        input:focus, select:focus { border-color: var(--primary-mid); box-shadow: 0 0 0 3px rgba(45, 106, 79, 0.15); }
+        .large-touch { min-height: 54px; }
+        .focus-highlight:focus { border-color: var(--success); box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.2); }
         
-        /* ACTIVITÉS ET AUTOCOMPLÉTION */
-        .activity-row { 
-            background: #f8fafc; 
-            border: 1.5px solid var(--border); 
-            border-radius: 12px; 
-            padding: 14px; 
-            margin-bottom: 14px; 
-        }
+        .activity-row { background: #f8fafc; border: 1.5px solid var(--border); border-radius: 12px; padding: 14px; margin-bottom: 14px; }
+        .activity-row-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+        .activity-row-title { font-size: 0.85rem; font-weight: 800; color: var(--primary-mid); text-transform: uppercase; letter-spacing: 0.5px; }
+        .remove-btn { background: #fee2e2; color: var(--danger); border: none; border-radius: 8px; width: 36px; height: 36px; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .relative-wrapper { position: relative; }
+        .autocomplete-suggestions { position: absolute; top: 100%; left: 0; right: 0; background: #ffffff; border: 2px solid var(--primary-mid); border-radius: 10px; margin-top: 4px; max-height: 240px; overflow-y: auto; z-index: 1000; box-shadow: 0 8px 20px rgba(0,0,0,0.15); }
+        .autocomplete-suggestion { padding: 14px; border-bottom: 1px solid #f1f5f9; font-size: 0.95rem; cursor: pointer; font-weight: 600; }
+        .autocomplete-suggestion:active { background: var(--primary-light); }
+        .suggestion-hint { font-size: 0.85rem; color: var(--primary-mid); margin-top: 6px; font-weight: 700; text-align: right; }
 
-        .activity-row-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 12px;
-            padding-bottom: 8px;
-            border-bottom: 1px solid var(--border);
-        }
+        button.action-btn { width: 100%; padding: 16px; border-radius: 12px; border: none; font-size: 1.05rem; font-weight: 800; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px; min-height: 52px; transition: transform 0.1s; }
+        button.action-btn:active { transform: scale(0.98); }
+        button.primary { background: var(--primary); color: white; }
+        button.success { background: var(--primary-mid); color: white; }
+        button.warning { background: var(--warning); color: white; }
+        button.secondary { background: #e2e8f0; color: var(--text-main); }
+        .large-action { font-size: 1.15rem; min-height: 60px; text-transform: uppercase; letter-spacing: 0.5px; box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3); }
 
-        .activity-row-title {
-            font-size: 0.85rem;
-            font-weight: 800;
-            color: var(--primary-mid);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .remove-btn {
-            background: #fee2e2;
-            color: var(--danger);
-            border: none;
-            border-radius: 8px;
-            width: 36px;
-            height: 36px;
-            font-size: 1.2rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-        }
-
-        .relative-wrapper { 
-            position: relative; 
-        }
+        .status-banner { padding: 14px 16px; border-radius: 10px; background: var(--primary-light); border-left: 5px solid var(--primary); color: var(--primary); font-size: 0.95rem; line-height: 1.5; margin-bottom: 14px; font-weight: 600; }
         
-        .autocomplete-suggestions { 
-            position: absolute; 
-            top: 100%; 
-            left: 0; 
-            right: 0; 
-            background: #ffffff; 
-            border: 2px solid var(--primary-mid); 
-            border-radius: 10px; 
-            margin-top: 4px; 
-            max-height: 240px; 
-            overflow-y: auto; 
-            z-index: 1000; 
-            box-shadow: 0 8px 20px rgba(0,0,0,0.15); 
-        }
+        /* TABLEAU DE BORD - KPI GRID */
+        .stat-grid-4 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 16px; }
+        .stat-card { background: #f8fafc; border: 1px solid var(--border); padding: 16px 12px; border-radius: 12px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+        .stat-value { font-size: 1.5rem; font-weight: 900; color: var(--primary); }
+        .stat-label { font-size: 0.8rem; color: var(--text-muted); font-weight: 800; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
 
-        .autocomplete-suggestion { 
-            padding: 14px; 
-            border-bottom: 1px solid #f1f5f9; 
-            font-size: 0.95rem; 
-            cursor: pointer; 
-            font-weight: 600; 
-        }
+        /* TABLEAU DE BORD - BARRES DE PROGRESSION */
+        .progress-item { margin-bottom: 16px; }
+        .progress-header { display: flex; justify-content: space-between; font-size: 0.9rem; font-weight: 800; margin-bottom: 6px; color: var(--text-main); }
+        .progress-track { background: #e2e8f0; height: 16px; border-radius: 8px; overflow: hidden; }
+        .progress-fill { background: var(--accent); height: 100%; border-radius: 8px; transition: width 0.5s ease-out; }
 
-        .autocomplete-suggestion:active { 
-            background: var(--primary-light); 
-        }
+        /* TABLEAU DE BORD - FILTRES */
+        .filters-group { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
+        .filters-group select, .filters-group input { padding: 10px 14px; font-size: 0.9rem; min-height: 44px; }
+        .filters-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 
-        .suggestion-hint { 
-            font-size: 0.85rem; 
-            color: var(--primary-mid); 
-            margin-top: 6px; 
-            font-weight: 700; 
-            text-align: right; 
-        }
+        .toast-notification { position: fixed; bottom: 85px; left: 50%; transform: translateX(-50%) translateY(150px); background: var(--success); color: white; padding: 16px 24px; border-radius: 30px; font-weight: 800; font-size: 1.05rem; box-shadow: 0 8px 20px rgba(0,0,0,0.25); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 1000; display: flex; align-items: center; gap: 12px; width: 90%; max-width: 400px; justify-content: center; }
+        .toast-notification.show { transform: translateX(-50%) translateY(0); }
 
-        /* BOUTONS GRAND FORMAT CHAMP */
-        button.action-btn { 
-            width: 100%; 
-            padding: 16px; 
-            border-radius: 12px; 
-            border: none; 
-            font-size: 1.05rem; 
-            font-weight: 800; 
-            cursor: pointer; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            gap: 8px; 
-            min-height: 52px;
-            transition: transform 0.1s;
-        }
-
-        button.action-btn:active { 
-            transform: scale(0.98); 
-        }
-
-        button.primary { 
-            background: var(--primary); 
-            color: white; 
-        }
-
-        button.success { 
-            background: var(--primary-mid); 
-            color: white; 
-        }
-
-        button.warning { 
-            background: var(--warning); 
-            color: white; 
-        }
-
-        button.secondary {
-            background: #e2e8f0;
-            color: var(--text-main);
-        }
-
-        .large-action {
-            font-size: 1.15rem;
-            min-height: 60px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3);
-        }
-
-        /* BANNIÈRES ET INDICATEURS */
-        .status-banner { 
-            padding: 14px 16px; 
-            border-radius: 10px; 
-            background: var(--primary-light); 
-            border-left: 5px solid var(--primary); 
-            color: var(--primary); 
-            font-size: 0.95rem; 
-            line-height: 1.5; 
-            margin-bottom: 14px; 
-            font-weight: 600; 
-        }
-
-        .stat-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-            margin-bottom: 16px;
-        }
-
-        .stat-card {
-            background: #f8fafc;
-            border: 1px solid var(--border);
-            padding: 14px;
-            border-radius: 10px;
-            text-align: center;
-        }
-
-        .stat-value {
-            font-size: 1.4rem;
-            font-weight: 800;
-            color: var(--primary);
-        }
-
-        .stat-label {
-            font-size: 0.8rem;
-            color: var(--text-muted);
-            font-weight: 700;
-            margin-top: 2px;
-        }
-
-        /* NOTIFICATION TOAST */
-        .toast-notification {
-            position: fixed;
-            bottom: 85px; 
-            left: 50%;
-            transform: translateX(-50%) translateY(150px);
-            background: var(--success);
-            color: white;
-            padding: 16px 24px;
-            border-radius: 30px;
-            font-weight: 800;
-            font-size: 1.05rem;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.25);
-            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            z-index: 1000;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            width: 90%;
-            max-width: 400px;
-            justify-content: center;
-        }
-
-        .toast-notification.show {
-            transform: translateX(-50%) translateY(0);
-        }
-
-        /* TABLEAUX ergonomiques */
-        .table-wrapper { 
-            overflow-x: auto; 
-            border-radius: 10px; 
-            border: 1px solid var(--border); 
-        }
-
-        table { 
-            width: 100%; 
-            border-collapse: collapse; 
-            background: #fff; 
-        }
-
-        th, td { 
-            padding: 12px 14px; 
-            text-align: left; 
-            font-size: 0.9rem; 
-            border-bottom: 1px solid var(--border); 
-            white-space: nowrap; 
-        }
-
-        th { 
-            background: #f1f5f9; 
-            color: var(--text-main); 
-            font-weight: 800; 
-        }
-
-        .tab-content { 
-            display: none; 
-        }
-
-        .tab-content.active { 
-            display: block; 
-        }
-
-        /* BLOC DE RECHERCHE EXPANDABLE OU MODAL */
-        .search-drawer {
-            margin-bottom: 14px;
-            background: #ffffff;
-            border: 1.5px dashed var(--primary-mid);
-            border-radius: 12px;
-            padding: 12px;
-        }
-
-        #capture-container { 
-            position: absolute; 
-            left: -9999px; 
-            top: 0; 
-            width: 900px; 
-            background: white; 
-            padding: 30px; 
-        }
+        .table-wrapper { overflow-x: auto; border-radius: 10px; border: 1px solid var(--border); }
+        table { width: 100%; border-collapse: collapse; background: #fff; }
+        th, td { padding: 12px 14px; text-align: left; font-size: 0.9rem; border-bottom: 1px solid var(--border); white-space: nowrap; }
+        th { background: #f1f5f9; color: var(--text-main); font-weight: 800; }
+        
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .search-drawer { margin-bottom: 14px; background: #ffffff; border: 1.5px dashed var(--primary-mid); border-radius: 12px; padding: 12px; }
+        #capture-container { position: absolute; left: -9999px; top: 0; width: 900px; background: white; padding: 30px; }
     </style>
 </head>
 <body>
 
-<!-- EN-TÊTE FIXE -->
 <header>
     <div class="header-brand">
         <span class="brand-logo">🌿 Canopy Madagascar</span>
@@ -481,13 +178,11 @@
     <div id="sync-status" class="sync-badge">🟠 Hors connexion</div>
 </header>
 
-<!-- CONTENEUR PRINCIPAL -->
 <div class="container">
 
-    <!-- PAGE 1 : SAISIE (PAGE PRINCIPALE) -->
+    <!-- TAB 1 : SAISIE -->
     <div id="tab-saisie" class="tab-content active">
         
-        <!-- MODULE DE RECHERCHE UNIFIÉ DE TÂCHES -->
         <div class="search-drawer">
             <label style="margin-bottom:4px;">🔍 Catalogue & Recherche Rapide</label>
             <div class="relative-wrapper">
@@ -497,12 +192,8 @@
             <div id="consultation-result" style="margin-top:10px; font-weight:700; font-size:0.9rem; color:var(--primary); padding:10px; background:var(--primary-light); border-radius:8px; display:none;"></div>
         </div>
 
-        <!-- CONTEXTE DE SAISIE (Fixe pour la session) -->
         <div class="card">
-            <div class="card-header">
-                <h2>📋 Informations de terrain</h2>
-            </div>
-            
+            <div class="card-header"><h2 style="margin:0;">📋 Informations de terrain</h2></div>
             <div class="form-row">
                 <div class="form-group">
                     <label>📅 Date</label>
@@ -513,7 +204,6 @@
                     <input type="text" id="input-saisie-projet" placeholder="Ex: Lot 2" onchange="onOuvrierOrDateChange()" class="large-touch">
                 </div>
             </div>
-
             <div class="form-row">
                 <div class="form-group">
                     <label>👥 Équipe</label>
@@ -524,78 +214,103 @@
                     <select id="select-ouvrier" onchange="onOuvrierOrDateChange()" class="large-touch focus-highlight"></select>
                 </div>
             </div>
-
             <div id="worker-status-banner" class="status-banner">Veuillez sélectionner un ouvrier.</div>
         </div>
 
-        <!-- MODULE DYNAMIQUE DES ACTIVITÉS -->
         <div class="card">
             <h2>✍️ Activités réalisées</h2>
-            
-            <div id="activities-container">
-                <!-- Les lignes d'activités seront injectées ici par JavaScript -->
-            </div>
-
+            <div id="activities-container"></div>
             <button type="button" class="action-btn secondary" onclick="addActivityRow()" style="margin-bottom: 20px; border: 2px dashed var(--primary-mid); background: transparent; color: var(--primary-mid);">
                 ➕ Ajouter une activité
             </button>
-
             <button onclick="enregistrerSaisie()" class="action-btn success large-action">
                 ✓ ENREGISTRER POUR CET OUVRIER
             </button>
         </div>
     </div>
 
-    <!-- PAGE 2 : TABLEAU DE BORD -->
+    <!-- TAB 2 : TABLEAU DE BORD AVANCÉ -->
     <div id="tab-dashboard" class="tab-content">
+        
+        <!-- FILTRES DYNAMIQUES -->
         <div class="card">
-            <h2>📊 Bilan des activités</h2>
-            <div class="form-group" style="margin-top:10px; margin-bottom:0;">
-                <label>Date du rapport</label>
-                <input type="date" id="report-date" onchange="rafraichirRapports()" class="large-touch">
+            <h2 style="margin-bottom: 12px; font-size:1.1rem;">⚙️ Filtres du Tableau de bord</h2>
+            <div class="filters-group">
+                <select id="filter-period" onchange="onPeriodChange()">
+                    <option value="today">Aujourd'hui</option>
+                    <option value="week">Cette semaine</option>
+                    <option value="month">Ce mois</option>
+                    <option value="custom">Période personnalisée...</option>
+                </select>
+                
+                <div id="custom-date-range" class="filters-grid" style="display:none;">
+                    <input type="date" id="filter-start" onchange="rafraichirDashboard()">
+                    <input type="date" id="filter-end" onchange="rafraichirDashboard()">
+                </div>
+                
+                <div class="filters-grid">
+                    <select id="filter-equipe" onchange="rafraichirDashboard()"><option value="">Toutes les équipes</option></select>
+                    <select id="filter-parcelle" onchange="rafraichirDashboard()"><option value="">Toutes les parcelles</option></select>
+                </div>
+                <select id="filter-ouvrier" onchange="rafraichirDashboard()"><option value="">Tous les ouvriers</option></select>
             </div>
         </div>
 
-        <div class="stat-grid">
+        <!-- 4 KPIs GLOBAUX -->
+        <div class="stat-grid-4">
             <div class="stat-card">
-                <div class="stat-value" id="stat-total-ouvriers">0</div>
-                <div class="stat-label">Ouvriers actifs</div>
+                <div class="stat-value" id="kpi-ouvriers">0</div>
+                <div class="stat-label">👷 Ouvriers actifs</div>
             </div>
             <div class="stat-card">
-                <div class="stat-value" id="stat-total-unites">0.00</div>
-                <div class="stat-label">Unités cumulées</div>
+                <div class="stat-value" id="kpi-activites">0</div>
+                <div class="stat-label">📋 Activités saisies</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="kpi-plants">0</div>
+                <div class="stat-label">🌱 Plants réalisés</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="kpi-total">0.00</div>
+                <div class="stat-label">📊 Total Unités</div>
             </div>
         </div>
 
+        <!-- ACTIVITÉS DU JOUR / PÉRIODE -->
         <div class="card">
-            <h2>Volumes Globaux Tâches</h2>
-            <div class="table-wrapper">
-                <table id="table-global-taches">
-                    <thead><tr><th>Tâche</th><th>Vol. Cumul</th><th>Unités</th></tr></thead>
-                    <tbody></tbody>
-                </table>
+            <h2>📈 Activités de la période</h2>
+            <div id="activites-progress-container">
+                <!-- Généré dynamiquement -->
+                <p style="color:var(--text-muted); font-size:0.9rem;">Aucune activité sur cette période.</p>
             </div>
         </div>
 
+        <!-- PERFORMANCE PAR OUVRIER (TABLEAU CROISÉ DYNAMIQUE) -->
         <div class="card">
-            <h2>Détail par Ouvrier</h2>
+            <h2>🏆 Performance par Ouvrier</h2>
             <div class="table-wrapper">
-                <table id="table-detail-ouvriers">
-                    <thead><tr><th>Ouvrier</th><th>Activités</th><th>Unités</th><th>Montant (Ar)</th><th>Action</th></tr></thead>
-                    <tbody></tbody>
+                <table id="table-performance">
+                    <thead>
+                        <tr id="th-performance">
+                            <!-- En-tête généré dynamiquement -->
+                        </tr>
+                    </thead>
+                    <tbody id="tb-performance">
+                        <!-- Lignes générées dynamiquement -->
+                    </tbody>
                 </table>
             </div>
             <button onclick="capturerRapport()" class="action-btn warning" style="margin-top:16px;">📸 Exporter le Bilan en Image</button>
         </div>
     </div>
 
-    <!-- PAGE 3 : SYNCHRONISATION -->
+    <!-- TAB 3 : SYNCHRONISATION -->
     <div id="tab-sync" class="tab-content">
         <div class="card">
             <h2>🔄 État de la Synchronisation</h2>
             <p style="font-size:0.9rem; color:var(--text-muted); margin-bottom:14px;">Gestion du stockage local et envoi vers la base centrale Google Sheets.</p>
             
-            <div class="stat-grid">
+            <div class="stat-grid-4" style="grid-template-columns: 1fr 1fr;">
                 <div class="stat-card">
                     <div class="stat-value" id="sync-stat-local">0</div>
                     <div class="stat-label">Données locales</div>
@@ -618,7 +333,7 @@
 
 </div>
 
-<!-- NAVIGATION INFÉRIEURE FIXE -->
+<!-- NAVIGATION INFÉRIEURE -->
 <nav class="bottom-nav">
     <button class="nav-button active" id="btn-nav-saisie" onclick="switchTab('tab-saisie', this)">
         <span class="nav-icon">📋</span>
@@ -626,11 +341,11 @@
     </button>
     <button class="nav-button" id="btn-nav-dashboard" onclick="switchTab('tab-dashboard', this)">
         <span class="nav-icon">📊</span>
-        <span>Tableau de bord</span>
+        <span>Bilan</span>
     </button>
     <button class="nav-button" id="btn-nav-sync" onclick="switchTab('tab-sync', this)">
         <span class="nav-icon">🔄</span>
-        <span>Synchronisation</span>
+        <span>Synchro</span>
     </button>
 </nav>
 
@@ -642,11 +357,11 @@
     
     let appState = { taches: [], ouvriers: [], saisies: [], activeChef: "" };
     let activityCount = 0;
+    let isFilterInit = false;
 
     window.onload = async () => {
         const todayStr = new Date().toISOString().split('T')[0];
         document.getElementById('input-saisie-date').value = todayStr;
-        document.getElementById('report-date').value = todayStr;
         
         chargerStockageLocal();
         await chargerReferentiels();
@@ -654,7 +369,7 @@
     };
 
     window.addEventListener('DOMContentLoaded', () => {
-        addActivityRow(); // Ajoute la première ligne vide au démarrage de la saisie
+        addActivityRow(); 
     });
 
     function chargerStockageLocal() {
@@ -685,7 +400,6 @@
                     })).filter(t => t.code && t.code.toLowerCase() !== 'id_tache');
                     localStorage.setItem('ref_taches', JSON.stringify(appState.taches));
                 }
-
                 if (data.ouvriers && data.ouvriers.length > 0) {
                     appState.ouvriers = data.ouvriers.map(row => ({
                         id: String(row[0] || '').trim(),         
@@ -695,7 +409,6 @@
                     })).filter(o => o.nom && o.id.toLowerCase() !== 'id_ouvrier' && o.statut.toLowerCase() !== 'inactif');
                     localStorage.setItem('ref_ouvriers', JSON.stringify(appState.ouvriers));
                 }
-
                 const pending = appState.saisies.filter(s => !s.synced).length;
                 if(pending === 0) {
                     updateSyncBadge("🟢 Synchronisé", "var(--success)", "rgba(22, 163, 74, 0.2)");
@@ -703,6 +416,7 @@
                     updateSyncBadge("🟠 Hors connexion", "var(--warning)", "rgba(217, 119, 6, 0.2)");
                 }
                 initialiserUI();
+                initDashboardFilters();
             }
         } catch (e) {
             updateSyncBadge("🔴 Erreur de synchronisation", "var(--danger)", "rgba(220, 38, 38, 0.2)");
@@ -711,11 +425,13 @@
 
     function initialiserUI() {
         const selectChef = document.getElementById('select-global-chef');
+        const ancienChef = selectChef.value;
         selectChef.innerHTML = '';
         const chefs = [...new Set(appState.ouvriers.map(o => o.chef).filter(Boolean))];
         if (chefs.length === 0) chefs.push("Aucun Chef");
         chefs.forEach(chef => { selectChef.innerHTML += `<option value="${chef}">${chef}</option>`; });
-        appState.activeChef = selectChef.options.length > 0 ? selectChef.options[0].value : "";
+        if (ancienChef && chefs.includes(ancienChef)) selectChef.value = ancienChef;
+        appState.activeChef = selectChef.value;
         onChefChange();
         rafraichirIndicateurSync();
     }
@@ -753,7 +469,7 @@
         return { taches: t, ar: ar };
     }
 
-    // GESTION DYNAMIQUE DES LIGNES D'ACTIVITÉS
+    // SAISIE - LIGNES DYNAMIQUES
     function addActivityRow(tacheVal = '', qteVal = '', dataValid = 'false', quotaVal = '', prixVal = '') {
         activityCount++;
         const container = document.getElementById('activities-container');
@@ -773,7 +489,7 @@
                 <label>Type d'activité</label>
                 <input type="text" class="act-code large-touch" inputmode="search" 
                        data-valid="${dataValid}" data-quota="${quotaVal}" data-prix="${prixVal}" value="${tacheVal}" 
-                       placeholder="Rechercher une tâche..." oninput="suggestCode(this)" onfocus="suggestCode(this)">
+                       placeholder="Rechercher..." oninput="suggestCode(this)" onfocus="suggestCode(this)">
                 <div class="autocomplete-suggestions"></div>
             </div>
             <div class="form-group" style="margin-bottom: 0;">
@@ -862,7 +578,7 @@
             const real = parseFloat(row.querySelector('.act-real').value);
 
             if (codeTxt && inp.getAttribute('data-valid') !== 'true') {
-                alert(`Erreur : Veuillez sélectionner "${codeTxt}" dans la liste déroulante.`);
+                alert(`Erreur : Veuillez sélectionner "${codeTxt}" dans la liste.`);
                 erreur = true;
             }
             if (!erreur && codeTxt && !isNaN(quota) && quota > 0 && !isNaN(real) && real > 0) {
@@ -876,7 +592,7 @@
 
         const stats = toutTachesDuJourOuvrier(ouvrier, date);
         const dispo = MAX_TACHES_JOUR - stats.taches;
-        if (dispo <= 0) return alert("Quota journalier déjà atteint pour cet ouvrier.");
+        if (dispo <= 0) return alert("Quota journalier atteint pour cet ouvrier.");
 
         const ratio = totalFractions > dispo ? (dispo / totalFractions) : 1;
         elements.forEach(el => {
@@ -889,99 +605,201 @@
         });
 
         localStorage.setItem('saisies_hors_ligne', JSON.stringify(appState.saisies));
+        showToast(ratio < 1 ? `Enregistré (Ajusté)` : `Enregistré pour ${ouvrier} !`);
         
-        // Notification
-        const message = ratio < 1 
-            ? `Enregistré (Ajusté au plafond max)` 
-            : `Enregistré pour ${ouvrier} !`;
-        showToast(message);
-        
-        // Réinitialisation douce des activités uniquement
         document.getElementById('activities-container').innerHTML = '';
         activityCount = 0;
         addActivityRow();
 
         onOuvrierOrDateChange(); 
         rafraichirIndicateurSync();
+        initDashboardFilters(); // Update filters just in case new parcelles were added
     }
 
     function showToast(message) {
         let toast = document.getElementById('app-toast');
         if (!toast) {
-            toast = document.createElement('div');
-            toast.id = 'app-toast';
-            toast.className = 'toast-notification';
-            document.body.appendChild(toast);
+            toast = document.createElement('div'); toast.id = 'app-toast';
+            toast.className = 'toast-notification'; document.body.appendChild(toast);
         }
         toast.innerHTML = `✅ ${message}`;
         toast.classList.add('show');
-        
-        setTimeout(() => {
-            toast.classList.remove('show');
-        }, 3000);
+        setTimeout(() => toast.classList.remove('show'), 3000);
     }
 
-    function editerSaisieOuvrier(date, ouvrier) {
-        if(!confirm(`Modifier les activités de ${ouvrier} ?`)) return;
-        switchTab('tab-saisie', document.getElementById('btn-nav-saisie'));
-        document.getElementById('input-saisie-date').value = date;
-        document.getElementById('select-ouvrier').value = ouvrier;
-        
-        const anc = appState.saisies.filter(s => s.dateTravail === date && s.nomOuvrier === ouvrier);
-        
-        document.getElementById('activities-container').innerHTML = '';
-        activityCount = 0;
-        
-        anc.forEach((item) => {
-            const tRef = appState.taches.find(t => `${t.code} - ${t.desc}` === item.tache);
-            const quota = tRef ? tRef.quota : '';
-            const prix = tRef ? tRef.prix : '';
-            addActivityRow(item.tache, item.quantite, 'true', quota, prix);
-        });
+    // ==========================================
+    // LOGIQUE DU TABLEAU DE BORD (BILAN)
+    // ==========================================
 
-        if (anc.length === 0) addActivityRow();
-        
-        appState.saisies = appState.saisies.filter(s => !(s.dateTravail === date && s.nomOuvrier === ouvrier));
-        localStorage.setItem('saisies_hors_ligne', JSON.stringify(appState.saisies));
-        onOuvrierOrDateChange(); 
-        rafraichirIndicateurSync();
+    function onPeriodChange() {
+        const p = document.getElementById('filter-period').value;
+        const customDiv = document.getElementById('custom-date-range');
+        if(p === 'custom') {
+            customDiv.style.display = 'grid';
+        } else {
+            customDiv.style.display = 'none';
+        }
+        rafraichirDashboard();
     }
 
-    function rafraichirRapports() {
-        const d = document.getElementById('report-date').value;
-        const tbodyG = document.querySelector('#table-global-taches tbody');
-        const tbodyD = document.querySelector('#table-detail-ouvriers tbody');
-        tbodyG.innerHTML = ''; tbodyD.innerHTML = '';
+    function getDateRange() {
+        const period = document.getElementById('filter-period').value;
+        const today = new Date();
+        let start = new Date(today);
+        let end = new Date(today);
 
-        const dataJour = appState.saisies.filter(s => s.dateTravail === d);
+        if (period === 'week') {
+            const day = today.getDay();
+            const diff = today.getDate() - day + (day === 0 ? -6 : 1);
+            start = new Date(today.setDate(diff));
+            end = new Date(start);
+            end.setDate(end.getDate() + 6);
+        } else if (period === 'month') {
+            start = new Date(today.getFullYear(), today.getMonth(), 1);
+            end = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+        } else if (period === 'custom') {
+            const sVal = document.getElementById('filter-start').value;
+            const eVal = document.getElementById('filter-end').value;
+            if(sVal) start = new Date(sVal);
+            if(eVal) end = new Date(eVal);
+        }
         
-        let totalOuvriersCount = 0;
-        let totalUnitesSum = 0;
+        return { 
+            start: start.toISOString().split('T')[0], 
+            end: end.toISOString().split('T')[0] 
+        };
+    }
 
-        if (dataJour.length > 0) {
-            let recap = {}, details = {};
-            dataJour.forEach(s => {
-                if (!recap[s.tache]) recap[s.tache] = { q:0, t:0 };
-                recap[s.tache].q += s.quantite; recap[s.tache].t += s.taches;
-                if (!details[s.nomOuvrier]) details[s.nomOuvrier] = { acts: [], totTaches:0, totAr:0 };
-                details[s.nomOuvrier].acts.push(`${s.tache} : ${s.quantite.toFixed(2)}`);
-                details[s.nomOuvrier].totTaches += s.taches; details[s.nomOuvrier].totAr += s.montantAr;
-                totalUnitesSum += s.taches;
-            });
-
-            totalOuvriersCount = Object.keys(details).length;
-
-            for (const [t, v] of Object.entries(recap)) {
-                tbodyG.innerHTML += `<tr><td>${t}</td><td>${v.q.toFixed(2)}</td><td>${v.t.toFixed(2)}</td></tr>`;
-            }
-            for (const [o, v] of Object.entries(details)) {
-                tbodyD.innerHTML += `<tr><td><strong>${o}</strong></td><td style="white-space:pre-wrap;">${v.acts.join('<br>')}</td><td>${v.totTaches.toFixed(2)}</td><td>${v.totAr.toLocaleString()}</td><td>${dataJour.find(x => x.nomOuvrier === o && x.synced) ? '✅' : `<button onclick="editerSaisieOuvrier('${d}', '${o}')" style="padding:6px 10px; font-size:0.8rem; background:#e2e8f0; border:none; border-radius:6px; font-weight:700;">Modifier</button>`}</td></tr>`;
-            }
+    function initDashboardFilters() {
+        if(!isFilterInit) {
+            const todayStr = new Date().toISOString().split('T')[0];
+            document.getElementById('filter-start').value = todayStr;
+            document.getElementById('filter-end').value = todayStr;
+            isFilterInit = true;
         }
 
-        document.getElementById('stat-total-ouvriers').innerText = totalOuvriersCount;
-        document.getElementById('stat-total-unites').innerText = totalUnitesSum.toFixed(2);
+        const selectP = document.getElementById('filter-parcelle');
+        const valP = selectP.value;
+        const parcelles = [...new Set(appState.saisies.map(s => s.projetParcelle).filter(Boolean))];
+        selectP.innerHTML = '<option value="">Toutes les parcelles</option>' + parcelles.map(p => `<option value="${p}">${p}</option>`).join('');
+        selectP.value = valP || "";
+
+        const selectE = document.getElementById('filter-equipe');
+        const valE = selectE.value;
+        const equipes = [...new Set(appState.ouvriers.map(o => o.chef).filter(Boolean))];
+        selectE.innerHTML = '<option value="">Toutes les équipes</option>' + equipes.map(e => `<option value="${e}">${e}</option>`).join('');
+        selectE.value = valE || "";
+
+        const selectO = document.getElementById('filter-ouvrier');
+        const valO = selectO.value;
+        const ouvriers = [...new Set(appState.ouvriers.map(o => o.nom).filter(Boolean))];
+        selectO.innerHTML = '<option value="">Tous les ouvriers</option>' + ouvriers.map(o => `<option value="${o}">${o}</option>`).join('');
+        selectO.value = valO || "";
     }
+
+    function rafraichirDashboard() {
+        const { start, end } = getDateRange();
+        const fEquipe = document.getElementById('filter-equipe').value;
+        const fParcelle = document.getElementById('filter-parcelle').value;
+        const fOuvrier = document.getElementById('filter-ouvrier').value;
+
+        // 1. Filtrer les données
+        const fData = appState.saisies.filter(s => {
+            let pass = true;
+            if (s.dateTravail < start || s.dateTravail > end) pass = false;
+            if (fEquipe && s.chefEquipe !== fEquipe) pass = false;
+            if (fParcelle && s.projetParcelle !== fParcelle) pass = false;
+            if (fOuvrier && s.nomOuvrier !== fOuvrier) pass = false;
+            return pass;
+        });
+
+        // 2. Calculer les 4 KPIs
+        const ouvriersUniques = new Set(fData.map(s => s.nomOuvrier)).size;
+        const totalActivites = fData.length; // Nombre de saisies
+        const totalPlants = fData.filter(s => s.tache.toLowerCase().includes('plant')).reduce((sum, s) => sum + s.quantite, 0);
+        const totalUnites = fData.reduce((sum, s) => sum + (s.taches || 0), 0);
+
+        document.getElementById('kpi-ouvriers').innerText = ouvriersUniques;
+        document.getElementById('kpi-activites').innerText = totalActivites;
+        document.getElementById('kpi-plants').innerText = Math.round(totalPlants).toLocaleString();
+        document.getElementById('kpi-total').innerText = totalUnites.toFixed(2);
+
+        // 3. Activités du jour (Barres de progression)
+        const actContainer = document.getElementById('activites-progress-container');
+        actContainer.innerHTML = '';
+        if (fData.length === 0) {
+            actContainer.innerHTML = '<p style="color:var(--text-muted); font-size:0.9rem;">Aucune activité enregistrée pour ces filtres.</p>';
+            document.getElementById('th-performance').innerHTML = '';
+            document.getElementById('tb-performance').innerHTML = '<tr><td colspan="100%">Aucune donnée.</td></tr>';
+            return;
+        }
+
+        let taskTotals = {};
+        fData.forEach(s => {
+            let shortName = s.tache.split(' - ')[0]; // On garde la description courte ou le code
+            taskTotals[shortName] = (taskTotals[shortName] || 0) + s.quantite;
+        });
+
+        const sortedTasksArr = Object.entries(taskTotals).sort((a,b) => b[1] - a[1]);
+        const maxQte = sortedTasksArr[0][1] || 1;
+
+        sortedTasksArr.forEach(([tName, qte]) => {
+            const percentage = Math.min(100, (qte / maxQte) * 100);
+            actContainer.innerHTML += `
+                <div class="progress-item">
+                    <div class="progress-header">
+                        <span>${tName}</span>
+                        <span>${qte.toFixed(1).replace(/\.0$/, '')}</span>
+                    </div>
+                    <div class="progress-track">
+                        <div class="progress-fill" style="width: ${percentage}%"></div>
+                    </div>
+                </div>
+            `;
+        });
+
+        // 4. Performance par ouvrier (Tableau croisé dynamique)
+        // Prendre les 3 ou 4 activités principales pour structurer les colonnes
+        const topTasksNames = sortedTasksArr.slice(0, 4).map(t => t[0]);
+        
+        let thHTML = `<th>Ouvrier</th>`;
+        topTasksNames.forEach(t => thHTML += `<th>${t.substring(0,10)}...</th>`);
+        thHTML += `<th>Autres</th><th>Total U.</th>`;
+        document.getElementById('th-performance').innerHTML = thHTML;
+
+        let ouvrierData = {};
+        fData.forEach(s => {
+            if(!ouvrierData[s.nomOuvrier]) ouvrierData[s.nomOuvrier] = { taches: {}, totalU: 0 };
+            let shortName = s.tache.split(' - ')[0];
+            ouvrierData[s.nomOuvrier].taches[shortName] = (ouvrierData[s.nomOuvrier].taches[shortName] || 0) + s.quantite;
+            ouvrierData[s.nomOuvrier].totalU += s.taches;
+        });
+
+        let tbHTML = '';
+        for (let ouvrier in ouvrierData) {
+            tbHTML += `<tr><td><strong>${ouvrier}</strong></td>`;
+            let autresQte = 0;
+            
+            // Compter la catégorie "Autres"
+            for(let t in ouvrierData[ouvrier].taches) {
+                if(!topTasksNames.includes(t)) autresQte += ouvrierData[ouvrier].taches[t];
+            }
+
+            // Générer les cellules pour le top 4
+            topTasksNames.forEach(t => {
+                let val = ouvrierData[ouvrier].taches[t] || 0;
+                tbHTML += `<td>${val > 0 ? val.toFixed(1).replace(/\.0$/, '') : '-'}</td>`;
+            });
+            
+            tbHTML += `<td>${autresQte > 0 ? autresQte.toFixed(1).replace(/\.0$/, '') : '-'}</td>`;
+            tbHTML += `<td><strong>${ouvrierData[ouvrier].totalU.toFixed(2)}</strong></td></tr>`;
+        }
+        document.getElementById('tb-performance').innerHTML = tbHTML;
+    }
+
+    // ==========================================
+    // SYNCHRONISATION ET UTILITAIRES
+    // ==========================================
 
     async function synchroniserDonnees() {
         if (!navigator.onLine) return alert("Pas de connexion internet disponible.");
@@ -1000,7 +818,8 @@
             localStorage.setItem('last_sync_time', timeStr);
             
             updateSyncBadge("🟢 Synchronisé", "var(--success)", "rgba(22, 163, 74, 0.2)");
-            rafraichirIndicateurSync(); rafraichirRapports();
+            rafraichirIndicateurSync(); 
+            if(document.getElementById('tab-dashboard').classList.contains('active')) rafraichirDashboard();
             alert("✅ Données synchronisées avec succès !");
         } catch (e) {
             updateSyncBadge("🔴 Erreur de synchronisation", "var(--danger)", "rgba(220, 38, 38, 0.2)");
@@ -1035,7 +854,10 @@
         document.getElementById(tabId).classList.add('active');
         btn.classList.add('active');
         
-        if (tabId === 'tab-dashboard') rafraichirRapports();
+        if (tabId === 'tab-dashboard') {
+            initDashboardFilters();
+            rafraichirDashboard();
+        }
         if (tabId === 'tab-sync') rafraichirIndicateurSync();
         
         window.scrollTo(0, 0);
@@ -1049,16 +871,17 @@
     }
 
     function capturerRapport() {
-        const d = document.getElementById('report-date').value;
+        const { start, end } = getDateRange();
+        let titleDate = start === end ? start : `Du ${start} au ${end}`;
         const cont = document.getElementById('capture-container');
         cont.innerHTML = `<div style="font-family:sans-serif; font-size:1.1rem; padding:20px;">
             <h1 style="color:#1b4332;text-align:center;font-size:1.6rem;">🌿 CANOPY MADAGASCAR</h1>
-            <h3 style="text-align:center;font-size:1.2rem;margin-bottom:20px;">Rapport d'activités: ${d} | Chef: ${appState.activeChef}</h3>
-            ${document.getElementById('tab-dashboard').innerHTML.replace(/<button.*?>.*?<\/button>/g, '')}
+            <h3 style="text-align:center;font-size:1.2rem;margin-bottom:20px;">Bilan Période : ${titleDate}</h3>
+            ${document.getElementById('tab-dashboard').innerHTML.replace(/<button.*?>.*?<\/button>/g, '').replace(/<select.*?>.*?<\/select>/g, '').replace(/<input.*?>/g, '')}
         </div>`;
         html2canvas(cont).then(canvas => {
             const link = document.createElement('a');
-            link.download = `Canopy_Rapport_${d}.png`;
+            link.download = `Canopy_Bilan_${start}.png`;
             link.href = canvas.toDataURL("image/png"); link.click();
             cont.innerHTML = '';
         });
