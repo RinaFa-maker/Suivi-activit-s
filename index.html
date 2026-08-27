@@ -173,7 +173,7 @@
             font-weight: 800; 
         }
 
-        /* FORMULAIRES DE SAISIE */
+        /* FORMULAIRES DE SAISIE & OPTIMISATION TACTILE */
         .form-group { 
             margin-bottom: 14px; 
         }
@@ -210,6 +210,15 @@
             border-color: var(--primary-mid); 
             box-shadow: 0 0 0 3px rgba(45, 106, 79, 0.15); 
         }
+
+        .large-touch {
+            min-height: 54px; /* Hauteur minimale recommandée pour le tactile */
+        }
+
+        .focus-highlight:focus {
+            border-color: var(--success);
+            box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.2);
+        }
         
         /* ACTIVITÉS ET AUTOCOMPLÉTION */
         .activity-row { 
@@ -220,13 +229,35 @@
             margin-bottom: 14px; 
         }
 
+        .activity-row-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border);
+        }
+
         .activity-row-title {
             font-size: 0.85rem;
             font-weight: 800;
             color: var(--primary-mid);
-            margin-bottom: 8px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
+        }
+
+        .remove-btn {
+            background: #fee2e2;
+            color: var(--danger);
+            border: none;
+            border-radius: 8px;
+            width: 36px;
+            height: 36px;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
         }
 
         .relative-wrapper { 
@@ -309,6 +340,14 @@
             color: var(--text-main);
         }
 
+        .large-action {
+            font-size: 1.15rem;
+            min-height: 60px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3);
+        }
+
         /* BANNIÈRES ET INDICATEURS */
         .status-banner { 
             padding: 14px 16px; 
@@ -348,6 +387,33 @@
             color: var(--text-muted);
             font-weight: 700;
             margin-top: 2px;
+        }
+
+        /* NOTIFICATION TOAST */
+        .toast-notification {
+            position: fixed;
+            bottom: 85px; 
+            left: 50%;
+            transform: translateX(-50%) translateY(150px);
+            background: var(--success);
+            color: white;
+            padding: 16px 24px;
+            border-radius: 30px;
+            font-weight: 800;
+            font-size: 1.05rem;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            width: 90%;
+            max-width: 400px;
+            justify-content: center;
+        }
+
+        .toast-notification.show {
+            transform: translateX(-50%) translateY(0);
         }
 
         /* TABLEAUX ergonomiques */
@@ -431,7 +497,7 @@
             <div id="consultation-result" style="margin-top:10px; font-weight:700; font-size:0.9rem; color:var(--primary); padding:10px; background:var(--primary-light); border-radius:8px; display:none;"></div>
         </div>
 
-        <!-- CONTEXTE DE SAISIE AVEC FLUX EXIGÉ : Date → Projet/Parcelle → Équipe → Ouvrier -->
+        <!-- CONTEXTE DE SAISIE (Fixe pour la session) -->
         <div class="card">
             <div class="card-header">
                 <h2>📋 Informations de terrain</h2>
@@ -440,76 +506,43 @@
             <div class="form-row">
                 <div class="form-group">
                     <label>📅 Date</label>
-                    <input type="date" id="input-saisie-date" onchange="onOuvrierOrDateChange()">
+                    <input type="date" id="input-saisie-date" onchange="onOuvrierOrDateChange()" class="large-touch">
                 </div>
                 <div class="form-group">
                     <label>📍 Projet / Parcelle</label>
-                    <input type="text" id="input-saisie-projet" placeholder="Ex: Lot 2 / Sahavalaina" onchange="onOuvrierOrDateChange()">
+                    <input type="text" id="input-saisie-projet" placeholder="Ex: Lot 2" onchange="onOuvrierOrDateChange()" class="large-touch">
                 </div>
             </div>
 
             <div class="form-row">
                 <div class="form-group">
-                    <label>👥 Équipe (Chef)</label>
-                    <select id="select-global-chef" onchange="onChefChange()"></select>
+                    <label>👥 Équipe</label>
+                    <select id="select-global-chef" onchange="onChefChange()" class="large-touch"></select>
                 </div>
                 <div class="form-group">
                     <label>👷‍♂️ Ouvrier</label>
-                    <select id="select-ouvrier" onchange="onOuvrierOrDateChange()"></select>
+                    <select id="select-ouvrier" onchange="onOuvrierOrDateChange()" class="large-touch focus-highlight"></select>
                 </div>
             </div>
 
             <div id="worker-status-banner" class="status-banner">Veuillez sélectionner un ouvrier.</div>
         </div>
 
-        <!-- FORMULAIRE SAISIE ACTIVITÉS -->
+        <!-- MODULE DYNAMIQUE DES ACTIVITÉS -->
         <div class="card">
-            <h2>✍️ Saisie des Activités (Max 3)</h2>
+            <h2>✍️ Activités réalisées</h2>
+            
             <div id="activities-container">
-                <!-- Tâche 1 -->
-                <div class="activity-row">
-                    <div class="activity-row-title">Activité 1</div>
-                    <div class="form-group relative-wrapper">
-                        <input type="text" class="act-code" inputmode="search" data-valid="false" placeholder="Rechercher / Sélectionner la tâche..." oninput="suggestCode(this)" onfocus="suggestCode(this)">
-                        <div class="autocomplete-suggestions"></div>
-                    </div>
-                    <div class="form-group" style="margin-bottom: 0;">
-                        <label>Quantité réalisée</label>
-                        <input type="number" class="act-real" inputmode="decimal" min="0" step="any" placeholder="0" oninput="recalculerLignes()">
-                        <div class="suggestion-hint"></div>
-                    </div>
-                </div>
-                
-                <!-- Tâche 2 -->
-                <div class="activity-row">
-                    <div class="activity-row-title">Activité 2</div>
-                    <div class="form-group relative-wrapper">
-                        <input type="text" class="act-code" inputmode="search" data-valid="false" placeholder="Rechercher / Sélectionner la tâche..." oninput="suggestCode(this)" onfocus="suggestCode(this)">
-                        <div class="autocomplete-suggestions"></div>
-                    </div>
-                    <div class="form-group" style="margin-bottom: 0;">
-                        <label>Quantité réalisée</label>
-                        <input type="number" class="act-real" inputmode="decimal" min="0" step="any" placeholder="0" oninput="recalculerLignes()">
-                        <div class="suggestion-hint"></div>
-                    </div>
-                </div>
-
-                <!-- Tâche 3 -->
-                <div class="activity-row">
-                    <div class="activity-row-title">Activité 3</div>
-                    <div class="form-group relative-wrapper">
-                        <input type="text" class="act-code" inputmode="search" data-valid="false" placeholder="Rechercher / Sélectionner la tâche..." oninput="suggestCode(this)" onfocus="suggestCode(this)">
-                        <div class="autocomplete-suggestions"></div>
-                    </div>
-                    <div class="form-group" style="margin-bottom: 0;">
-                        <label>Quantité réalisée</label>
-                        <input type="number" class="act-real" inputmode="decimal" min="0" step="any" placeholder="0" oninput="recalculerLignes()">
-                        <div class="suggestion-hint"></div>
-                    </div>
-                </div>
+                <!-- Les lignes d'activités seront injectées ici par JavaScript -->
             </div>
 
-            <button onclick="enregistrerSaisie()" class="action-btn success">💾 Valider et Enregistrer</button>
+            <button type="button" class="action-btn secondary" onclick="addActivityRow()" style="margin-bottom: 20px; border: 2px dashed var(--primary-mid); background: transparent; color: var(--primary-mid);">
+                ➕ Ajouter une activité
+            </button>
+
+            <button onclick="enregistrerSaisie()" class="action-btn success large-action">
+                ✓ ENREGISTRER POUR CET OUVRIER
+            </button>
         </div>
     </div>
 
@@ -519,7 +552,7 @@
             <h2>📊 Bilan des activités</h2>
             <div class="form-group" style="margin-top:10px; margin-bottom:0;">
                 <label>Date du rapport</label>
-                <input type="date" id="report-date" onchange="rafraichirRapports()">
+                <input type="date" id="report-date" onchange="rafraichirRapports()" class="large-touch">
             </div>
         </div>
 
@@ -608,6 +641,7 @@
     const MAX_TACHES_JOUR = 2; 
     
     let appState = { taches: [], ouvriers: [], saisies: [], activeChef: "" };
+    let activityCount = 0;
 
     window.onload = async () => {
         const todayStr = new Date().toISOString().split('T')[0];
@@ -618,6 +652,10 @@
         await chargerReferentiels();
         initialiserUI();
     };
+
+    window.addEventListener('DOMContentLoaded', () => {
+        addActivityRow(); // Ajoute la première ligne vide au démarrage de la saisie
+    });
 
     function chargerStockageLocal() {
         appState.taches = JSON.parse(localStorage.getItem('ref_taches') || '[]');
@@ -713,6 +751,39 @@
             if (s.nomOuvrier === ouvrier && s.dateTravail === date) { t += (s.taches || 0); ar += (s.montantAr || 0); }
         });
         return { taches: t, ar: ar };
+    }
+
+    // GESTION DYNAMIQUE DES LIGNES D'ACTIVITÉS
+    function addActivityRow(tacheVal = '', qteVal = '', dataValid = 'false', quotaVal = '', prixVal = '') {
+        activityCount++;
+        const container = document.getElementById('activities-container');
+        const row = document.createElement('div');
+        row.className = 'activity-row';
+        
+        const deleteBtnHTML = activityCount > 1 
+            ? `<button type="button" class="remove-btn" onclick="this.closest('.activity-row').remove(); recalculerLignes();">🗑️</button>` 
+            : `<div></div>`;
+
+        row.innerHTML = `
+            <div class="activity-row-header">
+                <div class="activity-row-title">Activité ${activityCount}</div>
+                ${deleteBtnHTML}
+            </div>
+            <div class="form-group relative-wrapper">
+                <label>Type d'activité</label>
+                <input type="text" class="act-code large-touch" inputmode="search" 
+                       data-valid="${dataValid}" data-quota="${quotaVal}" data-prix="${prixVal}" value="${tacheVal}" 
+                       placeholder="Rechercher une tâche..." oninput="suggestCode(this)" onfocus="suggestCode(this)">
+                <div class="autocomplete-suggestions"></div>
+            </div>
+            <div class="form-group" style="margin-bottom: 0;">
+                <label>Quantité réalisée</label>
+                <input type="number" class="act-real large-touch" inputmode="decimal" pattern="[0-9]*" min="0" step="any" 
+                       value="${qteVal}" placeholder="Ex: 80" oninput="recalculerLignes()">
+                <div class="suggestion-hint"></div>
+            </div>
+        `;
+        container.appendChild(row);
     }
 
     function suggestCode(inp) {
@@ -818,14 +889,36 @@
         });
 
         localStorage.setItem('saisies_hors_ligne', JSON.stringify(appState.saisies));
-        if (ratio < 1) alert("Volumes ajustés pour respecter le plafond de 2 unités.");
         
-        document.querySelectorAll('#activities-container .activity-row').forEach(r => {
-            r.querySelector('.act-code').value = ''; r.querySelector('.act-real').value = '';
-            r.querySelector('.act-code').setAttribute('data-valid', 'false');
-            r.querySelector('.suggestion-hint').innerText = '';
-        });
-        onOuvrierOrDateChange(); rafraichirIndicateurSync();
+        // Notification
+        const message = ratio < 1 
+            ? `Enregistré (Ajusté au plafond max)` 
+            : `Enregistré pour ${ouvrier} !`;
+        showToast(message);
+        
+        // Réinitialisation douce des activités uniquement
+        document.getElementById('activities-container').innerHTML = '';
+        activityCount = 0;
+        addActivityRow();
+
+        onOuvrierOrDateChange(); 
+        rafraichirIndicateurSync();
+    }
+
+    function showToast(message) {
+        let toast = document.getElementById('app-toast');
+        if (!toast) {
+            toast = document.createElement('div');
+            toast.id = 'app-toast';
+            toast.className = 'toast-notification';
+            document.body.appendChild(toast);
+        }
+        toast.innerHTML = `✅ ${message}`;
+        toast.classList.add('show');
+        
+        setTimeout(() => {
+            toast.classList.remove('show');
+        }, 3000);
     }
 
     function editerSaisieOuvrier(date, ouvrier) {
@@ -835,21 +928,23 @@
         document.getElementById('select-ouvrier').value = ouvrier;
         
         const anc = appState.saisies.filter(s => s.dateTravail === date && s.nomOuvrier === ouvrier);
-        const rows = document.querySelectorAll('#activities-container .activity-row');
-        rows.forEach(r => { r.querySelector('.act-code').value = ''; r.querySelector('.act-real').value = ''; });
         
-        anc.forEach((item, i) => {
-            if(rows[i]) {
-                const inp = rows[i].querySelector('.act-code');
-                const tRef = appState.taches.find(t => `${t.code} - ${t.desc}` === item.tache);
-                inp.value = item.tache; inp.setAttribute('data-valid', 'true');
-                if(tRef) { inp.setAttribute('data-quota', tRef.quota); inp.setAttribute('data-prix', tRef.prix); }
-                rows[i].querySelector('.act-real').value = item.quantite;
-            }
+        document.getElementById('activities-container').innerHTML = '';
+        activityCount = 0;
+        
+        anc.forEach((item) => {
+            const tRef = appState.taches.find(t => `${t.code} - ${t.desc}` === item.tache);
+            const quota = tRef ? tRef.quota : '';
+            const prix = tRef ? tRef.prix : '';
+            addActivityRow(item.tache, item.quantite, 'true', quota, prix);
         });
+
+        if (anc.length === 0) addActivityRow();
+        
         appState.saisies = appState.saisies.filter(s => !(s.dateTravail === date && s.nomOuvrier === ouvrier));
         localStorage.setItem('saisies_hors_ligne', JSON.stringify(appState.saisies));
-        onOuvrierOrDateChange(); rafraichirIndicateurSync();
+        onOuvrierOrDateChange(); 
+        rafraichirIndicateurSync();
     }
 
     function rafraichirRapports() {
