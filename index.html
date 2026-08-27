@@ -2,10 +2,10 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#1b4332">
+    <meta name="theme-color" content="#14532d">
     <link rel="apple-touch-icon" href="icon-192.png">
     
     <title>Canopy Madagascar - Suivi d'activités</title>
@@ -13,24 +13,33 @@
     
     <style>
         :root {
-            --bg-color: #f4f6f8;
-            --card-bg: #ffffff;
-            --primary: #1b4332;         
-            --primary-mid: #2d6a4f;     
-            --primary-light: #e8f5e9;   
-            --accent: #52b788;          
-            
-            --text-main: #1e293b;
+            --primary: #14532d;         /* Vert forêt profond */
+            --primary-hover: #166534;
+            --primary-light: #dcfce7;
+            --primary-muted: #bbf7d0;
+            --accent: #22c55e;          /* Vert dynamique */
+
+            --bg-app: #f8fafc;
+            --bg-card: #ffffff;
+            --text-main: #0f172a;
             --text-muted: #64748b;
-            --border: #cbd5e1;
-            
-            --success: #16a34a;         
-            --warning: #d97706;         
-            --danger: #dc2626;          
-            --info: #2563eb;            
-            
-            --radius: 14px;
-            --shadow: 0 4px 12px rgba(0,0,0,0.05);
+            --border: #e2e8f0;
+            --border-focus: #14532d;
+
+            --success: #16a34a;
+            --success-light: #dcfce7;
+            --warning: #ea580c;
+            --warning-light: #ffedd5;
+            --error: #dc2626;
+            --error-light: #fee2e2;
+            --info: #2563eb;
+            --info-light: #dbeafe;
+
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
         }
 
         * { 
@@ -42,26 +51,27 @@
         }
         
         body { 
-            background-color: var(--bg-color); 
+            background-color: var(--bg-app); 
             color: var(--text-main); 
             font-size: 1rem; 
             min-height: 100vh; 
             display: flex; 
             flex-direction: column; 
-            padding-bottom: 76px; 
+            padding-bottom: 84px; 
+            overflow-x: hidden;
         }
         
         header { 
             background: var(--primary); 
             color: white; 
-            padding: 14px 18px; 
+            padding: 16px; 
             display: flex; 
             justify-content: space-between; 
             align-items: center; 
             position: sticky; 
             top: 0; 
             z-index: 100; 
-            box-shadow: 0 2px 8px rgba(0,0,0,0.15); 
+            box-shadow: var(--shadow-md); 
         }
         
         .header-brand { display: flex; flex-direction: column; }
@@ -69,103 +79,116 @@
         .brand-subtitle { font-size: 0.82rem; opacity: 0.85; font-weight: 500; }
         
         .sync-badge { 
-            font-size: 0.85rem; 
-            padding: 6px 12px; 
+            font-size: 0.78rem; 
+            padding: 6px 10px; 
             border-radius: 20px; 
             background: rgba(255,255,255,0.15); 
             font-weight: 700; 
-            display: flex; align-items: center; gap: 6px; 
+            display: flex; 
+            align-items: center; 
+            gap: 6px; 
             transition: all 0.3s ease;
+            text-align: right;
+            max-width: 170px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .bottom-nav {
             position: fixed;
             bottom: 0; left: 0; right: 0;
-            height: 68px;
-            background: #ffffff;
+            height: 72px;
+            background: var(--bg-card);
             border-top: 1px solid var(--border);
             display: flex;
             justify-content: space-around;
             align-items: center;
             z-index: 200;
-            box-shadow: 0 -4px 12px rgba(0,0,0,0.05);
+            box-shadow: 0 -4px 16px rgba(0,0,0,0.06);
+            padding-bottom: env(safe-area-inset-bottom);
         }
 
         .nav-button {
             flex: 1; height: 100%; background: transparent; border: none;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
             gap: 4px; color: var(--text-muted); font-size: 0.75rem; font-weight: 700; cursor: pointer;
+            transition: color 0.2s ease;
         }
-        .nav-button .nav-icon { font-size: 1.4rem; }
+        .nav-button .nav-icon { font-size: 1.3rem; }
         .nav-button.active { color: var(--primary); background: var(--primary-light); border-top: 3px solid var(--primary); }
 
-        .container { padding: 16px; max-width: 800px; margin: 0 auto; width: 100%; flex: 1; }
-        .card { background: var(--card-bg); border-radius: var(--radius); padding: 18px; margin-bottom: 16px; box-shadow: var(--shadow); border: 1px solid rgba(0,0,0,0.03); }
-        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
-        .card h2 { font-size: 1.25rem; color: var(--primary); display: flex; align-items: center; gap: 8px; font-weight: 800; margin-bottom:14px; }
+        .container { padding: 16px; max-width: 600px; margin: 0 auto; width: 100%; flex: 1; }
+        .card { background: var(--bg-card); border-radius: var(--radius-md); padding: 16px; margin-bottom: 16px; box-shadow: var(--shadow-sm); border: 1px solid var(--border); }
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .card h2 { font-size: 1.15rem; color: var(--primary); display: flex; align-items: center; gap: 8px; font-weight: 800; margin-bottom: 12px; }
 
         .form-group { margin-bottom: 14px; }
         .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        label { display: block; margin-bottom: 6px; font-weight: 700; font-size: 0.9rem; color: var(--text-main); }
+        label { display: block; margin-bottom: 6px; font-weight: 700; font-size: 0.85rem; color: var(--text-main); }
         
         input, select { 
-            width: 100%; padding: 14px; border: 1.5px solid var(--border); border-radius: 10px; 
+            width: 100%; padding: 14px; border: 1.5px solid var(--border); border-radius: var(--radius-sm); 
             font-size: 1rem; background: #ffffff; color: var(--text-main); outline: none; 
             appearance: none; font-weight: 600; transition: border-color 0.2s, box-shadow 0.2s;
         }
-        input:focus, select:focus { border-color: var(--primary-mid); box-shadow: 0 0 0 3px rgba(45, 106, 79, 0.15); }
-        .large-touch { min-height: 54px; }
-        .focus-highlight:focus { border-color: var(--success); box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.2); }
+        input:focus, select:focus { border-color: var(--border-focus); box-shadow: 0 0 0 3px rgba(20, 83, 45, 0.12); }
+        .large-touch { min-height: 52px; }
         
-        .activity-row { background: #f8fafc; border: 1.5px solid var(--border); border-radius: 12px; padding: 14px; margin-bottom: 14px; }
-        .activity-row-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
-        .activity-row-title { font-size: 0.85rem; font-weight: 800; color: var(--primary-mid); text-transform: uppercase; letter-spacing: 0.5px; }
-        .remove-btn { background: #fee2e2; color: var(--danger); border: none; border-radius: 8px; width: 36px; height: 36px; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .activity-row { background: var(--bg-app); border: 1.5px solid var(--border); border-radius: var(--radius-md); padding: 14px; margin-bottom: 12px; }
+        .activity-row-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding-bottom: 6px; border-bottom: 1px solid var(--border); }
+        .activity-row-title { font-size: 0.8rem; font-weight: 800; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px; }
+        .remove-btn { background: var(--error-light); color: var(--error); border: none; border-radius: var(--radius-sm); width: 40px; height: 40px; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; cursor: pointer; }
         .relative-wrapper { position: relative; }
-        .autocomplete-suggestions { position: absolute; top: 100%; left: 0; right: 0; background: #ffffff; border: 2px solid var(--primary-mid); border-radius: 10px; margin-top: 4px; max-height: 240px; overflow-y: auto; z-index: 1000; box-shadow: 0 8px 20px rgba(0,0,0,0.15); }
-        .autocomplete-suggestion { padding: 14px; border-bottom: 1px solid #f1f5f9; font-size: 0.95rem; cursor: pointer; font-weight: 600; }
+        .autocomplete-suggestions { position: absolute; top: 100%; left: 0; right: 0; background: #ffffff; border: 2px solid var(--primary); border-radius: var(--radius-sm); margin-top: 4px; max-height: 220px; overflow-y: auto; z-index: 1000; box-shadow: var(--shadow-md); }
+        .autocomplete-suggestion { padding: 12px 14px; border-bottom: 1px solid var(--border); font-size: 0.9rem; cursor: pointer; font-weight: 600; }
         .autocomplete-suggestion:active { background: var(--primary-light); }
-        .suggestion-hint { font-size: 0.85rem; color: var(--primary-mid); margin-top: 6px; font-weight: 700; text-align: right; }
+        .suggestion-hint { font-size: 0.8rem; color: var(--primary); margin-top: 6px; font-weight: 700; text-align: right; }
 
-        button.action-btn { width: 100%; padding: 16px; border-radius: 12px; border: none; font-size: 1.05rem; font-weight: 800; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px; min-height: 52px; transition: transform 0.1s; }
-        button.action-btn:active { transform: scale(0.98); }
-        button.primary { background: var(--primary); color: white; }
-        button.success { background: var(--primary-mid); color: white; }
-        button.warning { background: var(--warning); color: white; }
-        button.secondary { background: #e2e8f0; color: var(--text-main); }
-        .large-action { font-size: 1.15rem; min-height: 60px; text-transform: uppercase; letter-spacing: 0.5px; box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3); }
-
-        .status-banner { padding: 14px 16px; border-radius: 10px; background: var(--primary-light); border-left: 5px solid var(--primary); color: var(--primary); font-size: 0.95rem; line-height: 1.5; margin-bottom: 14px; font-weight: 600; }
+        button.action-btn { width: 100%; padding: 14px; border-radius: var(--radius-md); border: none; font-size: 1rem; font-weight: 800; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px; min-height: 52px; transition: transform 0.1s, opacity 0.2s, background-color 0.2s; }
+        button.action-btn:active:not(:disabled) { transform: scale(0.98); }
+        button.action-btn:disabled { opacity: 0.45; cursor: not-allowed; filter: grayscale(0.6); }
         
-        /* TABLEAU DE BORD - KPI GRID */
-        .stat-grid-4 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 16px; }
-        .stat-card { background: #f8fafc; border: 1px solid var(--border); padding: 16px 12px; border-radius: 12px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
-        .stat-value { font-size: 1.5rem; font-weight: 900; color: var(--primary); }
-        .stat-label { font-size: 0.8rem; color: var(--text-muted); font-weight: 800; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+        button.primary { background: var(--primary); color: white; }
+        button.primary:hover:not(:disabled) { background: var(--primary-hover); }
+        button.success { background: var(--success); color: white; }
+        button.warning { background: var(--warning); color: white; }
+        button.secondary { background: var(--border); color: var(--text-main); }
+        .large-action { font-size: 1.05rem; min-height: 56px; text-transform: uppercase; letter-spacing: 0.5px; box-shadow: 0 4px 12px rgba(22, 163, 74, 0.25); }
 
-        /* TABLEAU DE BORD - BARRES DE PROGRESSION */
-        .progress-item { margin-bottom: 16px; }
-        .progress-header { display: flex; justify-content: space-between; font-size: 0.9rem; font-weight: 800; margin-bottom: 6px; color: var(--text-main); }
-        .progress-track { background: #e2e8f0; height: 16px; border-radius: 8px; overflow: hidden; }
-        .progress-fill { background: var(--accent); height: 100%; border-radius: 8px; transition: width 0.5s ease-out; }
+        .status-banner { padding: 12px 14px; border-radius: var(--radius-sm); background: var(--primary-light); border-left: 4px solid var(--primary); color: var(--primary); font-size: 0.9rem; line-height: 1.4; margin-bottom: 12px; font-weight: 600; }
+        
+        .stat-grid-4 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 16px; }
+        .stat-card { background: var(--bg-app); border: 1px solid var(--border); padding: 14px 10px; border-radius: var(--radius-md); text-align: center; }
+        .stat-value { font-size: 1.4rem; font-weight: 900; color: var(--primary); }
+        .stat-label { font-size: 0.75rem; color: var(--text-muted); font-weight: 800; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
 
-        /* TABLEAU DE BORD - FILTRES */
-        .filters-group { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
-        .filters-group select, .filters-group input { padding: 10px 14px; font-size: 0.9rem; min-height: 44px; }
-        .filters-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .progress-item { margin-bottom: 14px; }
+        .progress-header { display: flex; justify-content: space-between; font-size: 0.85rem; font-weight: 800; margin-bottom: 6px; color: var(--text-main); }
+        .progress-track { background: var(--border); height: 14px; border-radius: 7px; overflow: hidden; }
+        .progress-fill { background: var(--accent); height: 100%; border-radius: 7px; transition: width 0.5s ease-out; }
 
-        .toast-notification { position: fixed; bottom: 85px; left: 50%; transform: translateX(-50%) translateY(150px); background: var(--success); color: white; padding: 16px 24px; border-radius: 30px; font-weight: 800; font-size: 1.05rem; box-shadow: 0 8px 20px rgba(0,0,0,0.25); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 1000; display: flex; align-items: center; gap: 12px; width: 90%; max-width: 400px; justify-content: center; }
+        .filters-group { display: flex; flex-direction: column; gap: 10px; margin-bottom: 14px; }
+        .filters-group select, .filters-group input { padding: 10px 12px; font-size: 0.85rem; min-height: 44px; }
+        .filters-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+        .toast-notification { position: fixed; bottom: 85px; left: 50%; transform: translateX(-50%) translateY(150px); background: var(--success); color: white; padding: 14px 20px; border-radius: 30px; font-weight: 800; font-size: 0.95rem; box-shadow: 0 8px 20px rgba(0,0,0,0.2); transition: transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 1000; display: flex; align-items: center; gap: 10px; width: 90%; max-width: 380px; justify-content: center; }
         .toast-notification.show { transform: translateX(-50%) translateY(0); }
 
-        .table-wrapper { overflow-x: auto; border-radius: 10px; border: 1px solid var(--border); }
+        .table-wrapper { overflow-x: auto; border-radius: var(--radius-sm); border: 1px solid var(--border); }
         table { width: 100%; border-collapse: collapse; background: #fff; }
-        th, td { padding: 12px 14px; text-align: left; font-size: 0.9rem; border-bottom: 1px solid var(--border); white-space: nowrap; }
+        th, td { padding: 10px 12px; text-align: left; font-size: 0.85rem; border-bottom: 1px solid var(--border); white-space: nowrap; }
         th { background: #f1f5f9; color: var(--text-main); font-weight: 800; }
         
         .tab-content { display: none; }
         .tab-content.active { display: block; }
-        .search-drawer { margin-bottom: 14px; background: #ffffff; border: 1.5px dashed var(--primary-mid); border-radius: 12px; padding: 12px; }
+        .search-drawer { margin-bottom: 14px; background: #ffffff; border: 1.5px dashed var(--primary); border-radius: var(--radius-md); padding: 12px; }
         #capture-container { position: absolute; left: -9999px; top: 0; width: 900px; background: white; padding: 30px; }
+        
+        .sync-info-list { list-style: none; display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+        .sync-info-item { display: flex; justify-content: space-between; font-size: 0.9rem; padding: 10px; background: var(--bg-app); border-radius: var(--radius-sm); border: 1px solid var(--border); }
+        .sync-info-item span:first-child { color: var(--text-muted); font-weight: 600; }
+        .sync-info-item span:last-child { font-weight: 800; color: var(--text-main); }
     </style>
 </head>
 <body>
@@ -173,9 +196,9 @@
 <header>
     <div class="header-brand">
         <span class="brand-logo">🌿 Canopy Madagascar</span>
-        <span class="brand-subtitle">Suivi activités</span>
+        <span class="brand-subtitle">Suivi d'activités</span>
     </div>
-    <div id="sync-status" class="sync-badge">🟠 Hors connexion</div>
+    <div id="sync-status" class="sync-badge">🟢 Synchronisé</div>
 </header>
 
 <div class="container">
@@ -189,7 +212,7 @@
                 <input type="text" id="search-code" class="act-code" inputmode="search" oninput="suggestCode(this)" onfocus="suggestCode(this)" placeholder="Rechercher une tâche par nom ou code...">
                 <div class="autocomplete-suggestions"></div>
             </div>
-            <div id="consultation-result" style="margin-top:10px; font-weight:700; font-size:0.9rem; color:var(--primary); padding:10px; background:var(--primary-light); border-radius:8px; display:none;"></div>
+            <div id="consultation-result" style="margin-top:8px; font-weight:700; font-size:0.85rem; color:var(--primary); padding:8px; background:var(--primary-light); border-radius:6px; display:none;"></div>
         </div>
 
         <div class="card">
@@ -211,7 +234,7 @@
                 </div>
                 <div class="form-group">
                     <label>👷‍♂️ Ouvrier</label>
-                    <select id="select-ouvrier" onchange="onOuvrierOrDateChange()" class="large-touch focus-highlight"></select>
+                    <select id="select-ouvrier" onchange="onOuvrierOrDateChange()" class="large-touch"></select>
                 </div>
             </div>
             <div id="worker-status-banner" class="status-banner">Veuillez sélectionner un ouvrier.</div>
@@ -220,7 +243,7 @@
         <div class="card">
             <h2>✍️ Activités réalisées</h2>
             <div id="activities-container"></div>
-            <button type="button" class="action-btn secondary" onclick="addActivityRow()" style="margin-bottom: 20px; border: 2px dashed var(--primary-mid); background: transparent; color: var(--primary-mid);">
+            <button type="button" class="action-btn secondary" onclick="addActivityRow()" style="margin-bottom: 16px; border: 2px dashed var(--primary); background: transparent; color: var(--primary);">
                 ➕ Ajouter une activité
             </button>
             <button onclick="enregistrerSaisie()" class="action-btn success large-action">
@@ -232,9 +255,8 @@
     <!-- TAB 2 : TABLEAU DE BORD AVANCÉ -->
     <div id="tab-dashboard" class="tab-content">
         
-        <!-- FILTRES DYNAMIQUES -->
         <div class="card">
-            <h2 style="margin-bottom: 12px; font-size:1.1rem;">⚙️ Filtres du Tableau de bord</h2>
+            <h2 style="margin-bottom: 12px; font-size:1.05rem;">⚙️ Filtres multicritères</h2>
             <div class="filters-group">
                 <select id="filter-period" onchange="onPeriodChange()">
                     <option value="today">Aujourd'hui</option>
@@ -249,14 +271,17 @@
                 </div>
                 
                 <div class="filters-grid">
-                    <select id="filter-equipe" onchange="rafraichirDashboard()"><option value="">Toutes les équipes</option></select>
+                    <select id="filter-projet" onchange="rafraichirDashboard()"><option value="">Tous les projets</option></select>
                     <select id="filter-parcelle" onchange="rafraichirDashboard()"><option value="">Toutes les parcelles</option></select>
                 </div>
-                <select id="filter-ouvrier" onchange="rafraichirDashboard()"><option value="">Tous les ouvriers</option></select>
+                <div class="filters-grid">
+                    <select id="filter-equipe" onchange="rafraichirDashboard()"><option value="">Toutes les équipes</option></select>
+                    <select id="filter-ouvrier" onchange="rafraichirDashboard()"><option value="">Tous les ouvriers</option></select>
+                </div>
+                <select id="filter-activite" onchange="rafraichirDashboard()"><option value="">Toutes les activités</option></select>
             </div>
         </div>
 
-        <!-- 4 KPIs GLOBAUX -->
         <div class="stat-grid-4">
             <div class="stat-card">
                 <div class="stat-value" id="kpi-ouvriers">0</div>
@@ -276,31 +301,24 @@
             </div>
         </div>
 
-        <!-- ACTIVITÉS DU JOUR / PÉRIODE -->
         <div class="card">
             <h2>📈 Activités de la période</h2>
             <div id="activites-progress-container">
-                <!-- Généré dynamiquement -->
-                <p style="color:var(--text-muted); font-size:0.9rem;">Aucune activité sur cette période.</p>
+                <p style="color:var(--text-muted); font-size:0.85rem;">Aucune activité sur cette période.</p>
             </div>
         </div>
 
-        <!-- PERFORMANCE PAR OUVRIER (TABLEAU CROISÉ DYNAMIQUE) -->
         <div class="card">
             <h2>🏆 Performance par Ouvrier</h2>
             <div class="table-wrapper">
                 <table id="table-performance">
                     <thead>
-                        <tr id="th-performance">
-                            <!-- En-tête généré dynamiquement -->
-                        </tr>
+                        <tr id="th-performance"></tr>
                     </thead>
-                    <tbody id="tb-performance">
-                        <!-- Lignes générées dynamiquement -->
-                    </tbody>
+                    <tbody id="tb-performance"></tbody>
                 </table>
             </div>
-            <button onclick="capturerRapport()" class="action-btn warning" style="margin-top:16px;">📸 Exporter le Bilan en Image</button>
+            <button onclick="capturerRapport()" class="action-btn warning" style="margin-top:14px;">📸 Exporter le Bilan en Image</button>
         </div>
     </div>
 
@@ -308,32 +326,42 @@
     <div id="tab-sync" class="tab-content">
         <div class="card">
             <h2>🔄 État de la Synchronisation</h2>
-            <p style="font-size:0.9rem; color:var(--text-muted); margin-bottom:14px;">Gestion du stockage local et envoi vers la base centrale Google Sheets.</p>
+            <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:12px;">Contrôle de la persistance locale et transfert vers Google Sheets.</p>
             
-            <div class="stat-grid-4" style="grid-template-columns: 1fr 1fr;">
-                <div class="stat-card">
-                    <div class="stat-value" id="sync-stat-local">0</div>
-                    <div class="stat-label">Données locales</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value" id="sync-stat-pending" style="color:var(--warning);">0</div>
-                    <div class="stat-label">En attente réseau</div>
-                </div>
-            </div>
+            <ul class="sync-info-list">
+                <li class="sync-info-item">
+                    <span>État de connexion</span>
+                    <span id="sync-info-connection">Vérification...</span>
+                </li>
+                <li class="sync-info-item">
+                    <span>Données locales stockées</span>
+                    <span id="sync-info-local">0</span>
+                </li>
+                <li class="sync-info-item">
+                    <span>Données en attente</span>
+                    <span id="sync-info-pending" style="color:var(--warning);">0</span>
+                </li>
+                <li class="sync-info-item">
+                    <span>Dernière synchronisation</span>
+                    <span id="sync-info-last-time">Aucune</span>
+                </li>
+                <li class="sync-info-item" id="sync-error-row">
+                    <span>Dernière erreur</span>
+                    <span id="sync-info-last-error" style="color:var(--error);">Aucune</span>
+                </li>
+            </ul>
 
-            <div class="status-banner" id="sync-details-banner">
-                Dernière synchro : <strong id="last-sync-time">Aucune</strong><br>
-                Réseau : <strong id="network-status-text">Hors connexion</strong>
-            </div>
-
-            <button onclick="synchroniserDonnees()" class="action-btn primary" style="margin-bottom:12px;">📤 Envoyer vers Google Sheets</button>
-            <button onclick="chargerReferentiels()" class="action-btn secondary">📥 Mettre à jour les référentiels</button>
+            <button id="btn-sync-now" onclick="synchroniserDonnees()" class="action-btn primary" style="margin-bottom:10px;">
+                🔄 Synchroniser maintenant
+            </button>
+            <button onclick="chargerReferentiels()" class="action-btn secondary">
+                📥 Mettre à jour les référentiels
+            </button>
         </div>
     </div>
 
 </div>
 
-<!-- NAVIGATION INFÉRIEURE -->
 <nav class="bottom-nav">
     <button class="nav-button active" id="btn-nav-saisie" onclick="switchTab('tab-saisie', this)">
         <span class="nav-icon">📋</span>
@@ -355,7 +383,14 @@
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby3to942EW3_6UaNO76a1b0LNDrTQaSRQCFhZYBewolTslE54KzIQQAwTvLVvnzZkIi-g/exec";
     const MAX_TACHES_JOUR = 2; 
     
-    let appState = { taches: [], ouvriers: [], saisies: [], activeChef: "" };
+    let appState = { 
+        taches: [], 
+        ouvriers: [], 
+        saisies: [], 
+        activeChef: "",
+        isSyncing: false,
+        lastError: null
+    };
     let activityCount = 0;
     let isFilterInit = false;
 
@@ -364,6 +399,7 @@
         document.getElementById('input-saisie-date').value = todayStr;
         
         chargerStockageLocal();
+        migrerAnciennesDonneesLocales();
         await chargerReferentiels();
         initialiserUI();
     };
@@ -376,16 +412,42 @@
         appState.taches = JSON.parse(localStorage.getItem('ref_taches') || '[]');
         appState.ouvriers = JSON.parse(localStorage.getItem('ref_ouvriers') || '[]');
         appState.saisies = JSON.parse(localStorage.getItem('saisies_hors_ligne') || '[]');
+        appState.lastError = localStorage.getItem('last_sync_error') || null;
+    }
+
+    // Migration douce pour assurer la compatibilité des anciennes données
+    function migrerAnciennesDonneesLocales() {
+        let modifie = false;
+        appState.saisies = appState.saisies.map(record => {
+            if (!record.projet || !record.parcelle || !record.timestamp || record.syncStatus === undefined) {
+                modifie = true;
+                return {
+                    id: record.id || ('S_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4)),
+                    dateTravail: record.dateTravail || new Date().toISOString().split('T')[0],
+                    projetParcelle: record.projetParcelle || record.parcelle || "Canopy",
+                    chefEquipe: record.chefEquipe || record.equipe || "Non défini",
+                    nomOuvrier: record.nomOuvrier || record.ouvrier || "Inconnu",
+                    tache: record.tache || record.activite || "Tâche générale",
+                    quantite: Number(record.quantite) || 0,
+                    taches: Number(record.taches) || 0,
+                    montantAr: Number(record.montantAr) || 0,
+                    synced: record.synced !== undefined ? record.synced : true,
+                    timestamp: record.timestamp || Date.now()
+                };
+            }
+            return record;
+        });
+        if (modifie) {
+            localStorage.setItem('saisies_hors_ligne', JSON.stringify(appState.saisies));
+        }
     }
 
     async function chargerReferentiels() {
         if (!navigator.onLine) {
-            updateSyncBadge("🟠 Hors connexion", "var(--warning)", "rgba(217, 119, 6, 0.2)");
-            rafraichirIndicateurSync();
+            rafraichirEtatSync();
             return;
         }
         try {
-            updateSyncBadge("🔵 Synchronisation en cours", "var(--info)", "rgba(37, 99, 235, 0.2)");
             const res = await fetch(SCRIPT_URL);
             const data = await res.json();
 
@@ -409,17 +471,13 @@
                     })).filter(o => o.nom && o.id.toLowerCase() !== 'id_ouvrier' && o.statut.toLowerCase() !== 'inactif');
                     localStorage.setItem('ref_ouvriers', JSON.stringify(appState.ouvriers));
                 }
-                const pending = appState.saisies.filter(s => !s.synced).length;
-                if(pending === 0) {
-                    updateSyncBadge("🟢 Synchronisé", "var(--success)", "rgba(22, 163, 74, 0.2)");
-                } else {
-                    updateSyncBadge("🟠 Hors connexion", "var(--warning)", "rgba(217, 119, 6, 0.2)");
-                }
                 initialiserUI();
                 initDashboardFilters();
             }
         } catch (e) {
-            updateSyncBadge("🔴 Erreur de synchronisation", "var(--danger)", "rgba(220, 38, 38, 0.2)");
+            // Utilisation du cache local en cas de panne réseau
+        } finally {
+            rafraichirEtatSync();
         }
     }
 
@@ -433,7 +491,7 @@
         if (ancienChef && chefs.includes(ancienChef)) selectChef.value = ancienChef;
         appState.activeChef = selectChef.value;
         onChefChange();
-        rafraichirIndicateurSync();
+        rafraichirEtatSync();
     }
 
     function onChefChange() {
@@ -457,7 +515,7 @@
 
         banner.innerHTML = `<strong>${ouvrier}</strong><br>` +
                            `Validé : <strong>${stats.taches.toFixed(2)} / ${MAX_TACHES_JOUR} Unités</strong> (${stats.ar.toLocaleString()} Ar)<br>` +
-                           `<span style="color:var(--primary-mid);">Plafond restant : <strong>${reste.toFixed(2)} Unités</strong></span>`;
+                           `<span style="color:var(--primary);">Plafond restant : <strong>${reste.toFixed(2)} Unités</strong></span>`;
         recalculerLignes();
     }
 
@@ -469,7 +527,6 @@
         return { taches: t, ar: ar };
     }
 
-    // SAISIE - LIGNES DYNAMIQUES
     function addActivityRow(tacheVal = '', qteVal = '', dataValid = 'false', quotaVal = '', prixVal = '') {
         activityCount++;
         const container = document.getElementById('activities-container');
@@ -513,7 +570,7 @@
         appState.taches.filter(t => String(t.code + " " + t.desc).toLowerCase().includes(val)).slice(0, 10).forEach(m => {
             const div = document.createElement('div');
             div.className = 'autocomplete-suggestion';
-            div.innerHTML = `<strong>${m.code}</strong> - ${m.desc}<br><span style="color:var(--text-muted); font-size:0.8rem;">Quota: ${m.quota} ${m.unite}</span>`;
+            div.innerHTML = `<strong>${m.code}</strong> - ${m.desc}<br><span style="color:var(--text-muted); font-size:0.75rem;">Quota: ${m.quota} ${m.unite}</span>`;
             div.onclick = (e) => {
                 e.stopPropagation();
                 inp.value = `${m.code} - ${m.desc}`;
@@ -566,8 +623,11 @@
     function enregistrerSaisie() {
         const ouvrier = document.getElementById('select-ouvrier').value;
         const date = document.getElementById('input-saisie-date').value;
-        const projet = document.getElementById('input-saisie-projet').value || "Non spécifié";
-        if (!ouvrier || !date) return alert("Sélectionnez un ouvrier et une date.");
+        const projet = document.getElementById('input-saisie-projet').value.trim() || "Non spécifié";
+        if (!ouvrier || !date) {
+            showToast("Sélectionnez un ouvrier et une date.", "error");
+            return;
+        }
 
         let totalFractions = 0, elements = [], erreur = false;
         document.querySelectorAll('#activities-container .activity-row').forEach(row => {
@@ -578,7 +638,7 @@
             const real = parseFloat(row.querySelector('.act-real').value);
 
             if (codeTxt && inp.getAttribute('data-valid') !== 'true') {
-                alert(`Erreur : Veuillez sélectionner "${codeTxt}" dans la liste.`);
+                showToast(`Veuillez sélectionner "${codeTxt}" dans le catalogue.`, "error");
                 erreur = true;
             }
             if (!erreur && codeTxt && !isNaN(quota) && quota > 0 && !isNaN(real) && real > 0) {
@@ -588,57 +648,72 @@
         });
 
         if (erreur) return;
-        if (!elements.length) return alert("Renseignez au moins une tâche valide.");
+        if (!elements.length) {
+            showToast("Renseignez au moins une tâche valide.", "warning");
+            return;
+        }
 
         const stats = toutTachesDuJourOuvrier(ouvrier, date);
         const dispo = MAX_TACHES_JOUR - stats.taches;
-        if (dispo <= 0) return alert("Quota journalier atteint pour cet ouvrier.");
+        if (dispo <= 0) {
+            showToast("Quota journalier atteint pour cet ouvrier.", "error");
+            return;
+        }
 
         const ratio = totalFractions > dispo ? (dispo / totalFractions) : 1;
+        
         elements.forEach(el => {
             const qte = el.quantite * ratio;
             const t = qte / el.quota;
             appState.saisies.push({
-                dateTravail: date, projetParcelle: projet, chefEquipe: appState.activeChef, nomOuvrier: ouvrier,
-                tache: el.tache, quantite: qte, taches: t, montantAr: Math.round(t * el.prix), synced: false
+                id: 'S_' + Date.now + '_' + Math.random().toString(36).substr(2, 5),
+                dateTravail: date, 
+                projetParcelle: projet, 
+                chefEquipe: appState.activeChef, 
+                nomOuvrier: ouvrier,
+                tache: el.tache, 
+                quantite: qte, 
+                taches: t, 
+                montantAr: Math.round(t * el.prix), 
+                synced: false,
+                timestamp: Date.now()
             });
         });
 
         localStorage.setItem('saisies_hors_ligne', JSON.stringify(appState.saisies));
-        showToast(ratio < 1 ? `Enregistré (Ajusté)` : `Enregistré pour ${ouvrier} !`);
+        
+        showToast(ratio < 1 ? `Enregistré localement (Ajusté)` : `Enregistré pour ${ouvrier} !`, "success");
         
         document.getElementById('activities-container').innerHTML = '';
         activityCount = 0;
         addActivityRow();
 
         onOuvrierOrDateChange(); 
-        rafraichirIndicateurSync();
-        initDashboardFilters(); // Update filters just in case new parcelles were added
+        rafraichirEtatSync();
+        initDashboardFilters();
+        
+        if(navigator.onLine) {
+            synchroniserDonnees(true);
+        }
     }
 
-    function showToast(message) {
+    function showToast(message, type = 'success') {
         let toast = document.getElementById('app-toast');
         if (!toast) {
             toast = document.createElement('div'); toast.id = 'app-toast';
             toast.className = 'toast-notification'; document.body.appendChild(toast);
         }
-        toast.innerHTML = `✅ ${message}`;
+        let icon = type === 'error' ? '✕' : (type === 'warning' ? '⚠' : '✓');
+        toast.innerHTML = `<span>${icon}</span> ${message}`;
+        toast.style.background = type === 'error' ? 'var(--error)' : (type === 'warning' ? 'var(--warning)' : 'var(--success)');
         toast.classList.add('show');
         setTimeout(() => toast.classList.remove('show'), 3000);
     }
 
-    // ==========================================
-    // LOGIQUE DU TABLEAU DE BORD (BILAN)
-    // ==========================================
-
     function onPeriodChange() {
         const p = document.getElementById('filter-period').value;
         const customDiv = document.getElementById('custom-date-range');
-        if(p === 'custom') {
-            customDiv.style.display = 'grid';
-        } else {
-            customDiv.style.display = 'none';
-        }
+        customDiv.style.display = (p === 'custom') ? 'grid' : 'none';
         rafraichirDashboard();
     }
 
@@ -678,44 +753,41 @@
             isFilterInit = true;
         }
 
-        const selectP = document.getElementById('filter-parcelle');
-        const valP = selectP.value;
-        const parcelles = [...new Set(appState.saisies.map(s => s.projetParcelle).filter(Boolean))];
-        selectP.innerHTML = '<option value="">Toutes les parcelles</option>' + parcelles.map(p => `<option value="${p}">${p}</option>`).join('');
-        selectP.value = valP || "";
+        const peupleSelect = (id, options, labelAll) => {
+            const sel = document.getElementById(id);
+            const val = sel.value;
+            sel.innerHTML = `<option value="">${labelAll}</option>` + options.map(o => `<option value="${o}">${o}</option>`).join('');
+            sel.value = val || "";
+        };
 
-        const selectE = document.getElementById('filter-equipe');
-        const valE = selectE.value;
-        const equipes = [...new Set(appState.ouvriers.map(o => o.chef).filter(Boolean))];
-        selectE.innerHTML = '<option value="">Toutes les équipes</option>' + equipes.map(e => `<option value="${e}">${e}</option>`).join('');
-        selectE.value = valE || "";
-
-        const selectO = document.getElementById('filter-ouvrier');
-        const valO = selectO.value;
-        const ouvriers = [...new Set(appState.ouvriers.map(o => o.nom).filter(Boolean))];
-        selectO.innerHTML = '<option value="">Tous les ouvriers</option>' + ouvriers.map(o => `<option value="${o}">${o}</option>`).join('');
-        selectO.value = valO || "";
+        peupleSelect('filter-projet', [...new Set(appState.saisies.map(s => s.projetParcelle).filter(Boolean))], "Tous les projets");
+        peupleSelect('filter-parcelle', [...new Set(appState.saisies.map(s => s.projetParcelle).filter(Boolean))], "Toutes les parcelles");
+        peupleSelect('filter-equipe', [...new Set(appState.ouvriers.map(o => o.chef).filter(Boolean))], "Toutes les équipes");
+        peupleSelect('filter-ouvrier', [...new Set(appState.ouvriers.map(o => o.nom).filter(Boolean))], "Tous les ouvriers");
+        peupleSelect('filter-activite', [...new Set(appState.saisies.map(s => s.tache).filter(Boolean))], "Toutes les activités");
     }
 
     function rafraichirDashboard() {
         const { start, end } = getDateRange();
-        const fEquipe = document.getElementById('filter-equipe').value;
+        const fProjet = document.getElementById('filter-projet').value;
         const fParcelle = document.getElementById('filter-parcelle').value;
+        const fEquipe = document.getElementById('filter-equipe').value;
         const fOuvrier = document.getElementById('filter-ouvrier').value;
+        const fActivite = document.getElementById('filter-activite').value;
 
-        // 1. Filtrer les données
         const fData = appState.saisies.filter(s => {
             let pass = true;
             if (s.dateTravail < start || s.dateTravail > end) pass = false;
-            if (fEquipe && s.chefEquipe !== fEquipe) pass = false;
+            if (fProjet && s.projetParcelle !== fProjet) pass = false;
             if (fParcelle && s.projetParcelle !== fParcelle) pass = false;
+            if (fEquipe && s.chefEquipe !== fEquipe) pass = false;
             if (fOuvrier && s.nomOuvrier !== fOuvrier) pass = false;
+            if (fActivite && s.tache !== fActivite) pass = false;
             return pass;
         });
 
-        // 2. Calculer les 4 KPIs
         const ouvriersUniques = new Set(fData.map(s => s.nomOuvrier)).size;
-        const totalActivites = fData.length; // Nombre de saisies
+        const totalActivites = fData.length;
         const totalPlants = fData.filter(s => s.tache.toLowerCase().includes('plant')).reduce((sum, s) => sum + s.quantite, 0);
         const totalUnites = fData.reduce((sum, s) => sum + (s.taches || 0), 0);
 
@@ -724,11 +796,10 @@
         document.getElementById('kpi-plants').innerText = Math.round(totalPlants).toLocaleString();
         document.getElementById('kpi-total').innerText = totalUnites.toFixed(2);
 
-        // 3. Activités du jour (Barres de progression)
         const actContainer = document.getElementById('activites-progress-container');
         actContainer.innerHTML = '';
         if (fData.length === 0) {
-            actContainer.innerHTML = '<p style="color:var(--text-muted); font-size:0.9rem;">Aucune activité enregistrée pour ces filtres.</p>';
+            actContainer.innerHTML = '<p style="color:var(--text-muted); font-size:0.85rem;">Aucune activité sur cette période.</p>';
             document.getElementById('th-performance').innerHTML = '';
             document.getElementById('tb-performance').innerHTML = '<tr><td colspan="100%">Aucune donnée.</td></tr>';
             return;
@@ -736,7 +807,7 @@
 
         let taskTotals = {};
         fData.forEach(s => {
-            let shortName = s.tache.split(' - ')[0]; // On garde la description courte ou le code
+            let shortName = s.tache.split(' - ')[0];
             taskTotals[shortName] = (taskTotals[shortName] || 0) + s.quantite;
         });
 
@@ -758,12 +829,10 @@
             `;
         });
 
-        // 4. Performance par ouvrier (Tableau croisé dynamique)
-        // Prendre les 3 ou 4 activités principales pour structurer les colonnes
         const topTasksNames = sortedTasksArr.slice(0, 4).map(t => t[0]);
         
         let thHTML = `<th>Ouvrier</th>`;
-        topTasksNames.forEach(t => thHTML += `<th>${t.substring(0,10)}...</th>`);
+        topTasksNames.forEach(t => thHTML += `<th>${t.substring(0,8)}...</th>`);
         thHTML += `<th>Autres</th><th>Total U.</th>`;
         document.getElementById('th-performance').innerHTML = thHTML;
 
@@ -780,12 +849,10 @@
             tbHTML += `<tr><td><strong>${ouvrier}</strong></td>`;
             let autresQte = 0;
             
-            // Compter la catégorie "Autres"
             for(let t in ouvrierData[ouvrier].taches) {
                 if(!topTasksNames.includes(t)) autresQte += ouvrierData[ouvrier].taches[t];
             }
 
-            // Générer les cellules pour le top 4
             topTasksNames.forEach(t => {
                 let val = ouvrierData[ouvrier].taches[t] || 0;
                 tbHTML += `<td>${val > 0 ? val.toFixed(1).replace(/\.0$/, '') : '-'}</td>`;
@@ -797,53 +864,96 @@
         document.getElementById('tb-performance').innerHTML = tbHTML;
     }
 
-    // ==========================================
-    // SYNCHRONISATION ET UTILITAIRES
-    // ==========================================
+    function rafraichirEtatSync() {
+        const totalLocal = appState.saisies.length;
+        const pendingList = appState.saisies.filter(s => !s.synced);
+        const pendingCount = pendingList.length;
+        const isOnline = navigator.onLine;
 
-    async function synchroniserDonnees() {
-        if (!navigator.onLine) return alert("Pas de connexion internet disponible.");
-        const aSync = appState.saisies.filter(s => !s.synced);
-        if (!aSync.length) return alert("Toutes les données locales sont déjà synchronisées !");
+        document.getElementById('sync-info-connection').innerText = isOnline ? "🟢 En ligne" : "🟠 Hors connexion";
+        document.getElementById('sync-info-local').innerText = totalLocal;
+        document.getElementById('sync-info-pending').innerText = pendingCount;
+        document.getElementById('sync-info-last-time').innerText = localStorage.getItem('last_sync_time') || "Aucune";
         
-        updateSyncBadge("🔵 Synchronisation en cours", "var(--info)", "rgba(37, 99, 235, 0.2)");
+        const lastErr = localStorage.getItem('last_sync_error');
+        const errElem = document.getElementById('sync-info-last-error');
+        if(lastErr) {
+            errElem.innerText = lastErr;
+            errElem.style.color = "var(--error)";
+        } else {
+            errElem.innerText = "Aucune";
+            errElem.style.color = "var(--text-muted)";
+        }
 
-        try {
-            await fetch(SCRIPT_URL, { method: "POST", mode: "no-cors", headers: { "Content-Type": "application/json" }, body: JSON.stringify(aSync) });
-            appState.saisies.forEach(s => s.synced = true);
-            localStorage.setItem('saisies_hors_ligne', JSON.stringify(appState.saisies));
-            
-            const now = new Date();
-            const timeStr = now.toLocaleDateString() + ' à ' + now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-            localStorage.setItem('last_sync_time', timeStr);
-            
-            updateSyncBadge("🟢 Synchronisé", "var(--success)", "rgba(22, 163, 74, 0.2)");
-            rafraichirIndicateurSync(); 
-            if(document.getElementById('tab-dashboard').classList.contains('active')) rafraichirDashboard();
-            alert("✅ Données synchronisées avec succès !");
-        } catch (e) {
-            updateSyncBadge("🔴 Erreur de synchronisation", "var(--danger)", "rgba(220, 38, 38, 0.2)");
-            alert("Erreur de connexion lors de la synchronisation.");
+        const btnSync = document.getElementById('btn-sync-now');
+        if (btnSync) {
+            btnSync.disabled = (pendingCount === 0 || appState.isSyncing || !isOnline);
+        }
+
+        const badge = document.getElementById('sync-status');
+        if (appState.isSyncing) {
+            setSyncBadge("🔵 Synchro en cours...", "var(--info)", "var(--info-light)");
+        } else if (appState.lastError && pendingCount > 0) {
+            setSyncBadge(`🔴 Erreur (${pendingCount})`, "var(--error)", "var(--error-light)");
+        } else if (!isOnline) {
+            setSyncBadge(`🟠 Hors ligne (${pendingCount})`, "var(--warning)", "var(--warning-light)");
+        } else if (pendingCount > 0) {
+            setSyncBadge(`🟠 ${pendingCount} en attente`, "var(--warning)", "var(--warning-light)");
+        } else {
+            setSyncBadge("🟢 Synchronisé", "var(--success)", "var(--success-light)");
         }
     }
 
-    function rafraichirIndicateurSync() {
-        const totalLocal = appState.saisies.length;
-        const pending = appState.saisies.filter(s => !s.synced).length;
-        
-        document.getElementById('sync-stat-local').innerText = totalLocal;
-        document.getElementById('sync-stat-pending').innerText = pending;
-        
-        const lastSync = localStorage.getItem('last_sync_time') || "Aucune";
-        document.getElementById('last-sync-time').innerText = lastSync;
-        document.getElementById('network-status-text').innerText = navigator.onLine ? "En ligne" : "Hors ligne";
+    function setSyncBadge(txt, color, bg) {
+        const b = document.getElementById('sync-status');
+        b.innerText = txt;
+        b.style.color = color;
+        b.style.background = bg;
+    }
 
+    async function synchroniserDonnees(isBackground = false) {
         if (!navigator.onLine) {
-            updateSyncBadge("🟠 Hors connexion", "var(--warning)", "rgba(217, 119, 6, 0.2)");
-        } else if (pending > 0) {
-            updateSyncBadge("🟠 En attente", "var(--warning)", "rgba(217, 119, 6, 0.2)");
-        } else {
-            updateSyncBadge("🟢 Synchronisé", "var(--success)", "rgba(22, 163, 74, 0.2)");
+            if(!isBackground) showToast("Pas de connexion Internet.", "warning");
+            rafraichirEtatSync();
+            return;
+        }
+
+        const pendingItems = appState.saisies.filter(s => !s.synced);
+        if (!pendingItems.length) {
+            rafraichirEtatSync();
+            return;
+        }
+
+        appState.isSyncing = true;
+        rafraichirEtatSync();
+
+        try {
+            await fetch(SCRIPT_URL, { 
+                method: "POST", 
+                mode: "no-cors", 
+                headers: { "Content-Type": "application/json" }, 
+                body: JSON.stringify(pendingItems) 
+            });
+
+            appState.saisies.forEach(s => s.synced = true);
+            localStorage.setItem('saisies_hors_ligne', JSON.stringify(appState.saisies));
+            
+            const nowStr = new Date().toLocaleDateString() + ' à ' + new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            localStorage.setItem('last_sync_time', nowStr);
+            
+            appState.lastError = null;
+            localStorage.removeItem('last_sync_error');
+
+            if(!isBackground) showToast("Synchronisation réussie !", "success");
+        } catch (e) {
+            const errTxt = "Échec d'envoi réseau";
+            appState.lastError = errTxt;
+            localStorage.setItem('last_sync_error', errTxt);
+            if(!isBackground) showToast(errTxt, "error");
+        } finally {
+            appState.isSyncing = false;
+            rafraichirEtatSync();
+            if(document.getElementById('tab-dashboard').classList.contains('active')) rafraichirDashboard();
         }
     }
 
@@ -858,25 +968,18 @@
             initDashboardFilters();
             rafraichirDashboard();
         }
-        if (tabId === 'tab-sync') rafraichirIndicateurSync();
+        if (tabId === 'tab-sync') rafraichirEtatSync();
         
         window.scrollTo(0, 0);
-    }
-
-    function updateSyncBadge(txt, textColor, bgColor) {
-        const b = document.getElementById('sync-status');
-        b.innerText = txt; 
-        b.style.color = textColor;
-        b.style.background = bgColor || "rgba(255,255,255,0.15)";
     }
 
     function capturerRapport() {
         const { start, end } = getDateRange();
         let titleDate = start === end ? start : `Du ${start} au ${end}`;
         const cont = document.getElementById('capture-container');
-        cont.innerHTML = `<div style="font-family:sans-serif; font-size:1.1rem; padding:20px;">
-            <h1 style="color:#1b4332;text-align:center;font-size:1.6rem;">🌿 CANOPY MADAGASCAR</h1>
-            <h3 style="text-align:center;font-size:1.2rem;margin-bottom:20px;">Bilan Période : ${titleDate}</h3>
+        cont.innerHTML = `<div style="font-family:sans-serif; padding:20px;">
+            <h1 style="color:#14532d;text-align:center;font-size:1.5rem;">🌿 CANOPY MADAGASCAR</h1>
+            <h3 style="text-align:center;font-size:1rem;margin-bottom:20px;">Bilan Période : ${titleDate}</h3>
             ${document.getElementById('tab-dashboard').innerHTML.replace(/<button.*?>.*?<\/button>/g, '').replace(/<select.*?>.*?<\/select>/g, '').replace(/<input.*?>/g, '')}
         </div>`;
         html2canvas(cont).then(canvas => {
@@ -888,12 +991,13 @@
     }
 
     window.addEventListener('online', () => {
-        document.getElementById('network-status-text').innerText = "En ligne";
+        rafraichirEtatSync();
         chargerReferentiels();
+        synchroniserDonnees(true);
     });
+    
     window.addEventListener('offline', () => {
-        document.getElementById('network-status-text').innerText = "Hors connexion";
-        updateSyncBadge("🟠 Hors connexion", "var(--warning)", "rgba(217, 119, 6, 0.2)");
+        rafraichirEtatSync();
     });
 </script>
 </body>
