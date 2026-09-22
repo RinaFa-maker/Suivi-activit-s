@@ -1,0 +1,1146 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#14532d">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    
+    <title>Canopy Madagascar - Suivi d'activités</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
+    <style>
+        :root {
+            --primary: #14532d;
+            --primary-hover: #166534;
+            --primary-light: #dcfce7;
+            --primary-muted: #bbf7d0;
+            --accent: #22c55e;
+
+            --bg-app: #f8fafc;
+            --bg-card: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --border-focus: #14532d;
+
+            --success: #16a34a;
+            --success-light: #dcfce7;
+            --warning: #ea580c;
+            --warning-light: #ffedd5;
+            --error: #dc2626;
+            --error-light: #fee2e2;
+            --info: #2563eb;
+            --info-light: #dbeafe;
+
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        * { 
+            box-sizing: border-box; 
+            margin: 0; 
+            padding: 0; 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
+            -webkit-tap-highlight-color: transparent; 
+        }
+        
+        body { 
+            background-color: var(--bg-app); 
+            color: var(--text-main); 
+            font-size: 1rem; 
+            min-height: 100vh; 
+            display: flex; 
+            flex-direction: column; 
+            padding-bottom: 84px; 
+            overflow-x: hidden;
+        }
+        
+        header { 
+            background: var(--primary); 
+            color: white; 
+            padding: 16px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            position: sticky; 
+            top: 0; 
+            z-index: 100; 
+            box-shadow: var(--shadow-md); 
+        }
+        
+        .header-brand { display: flex; flex-direction: column; }
+        .brand-logo { font-size: 1.15rem; font-weight: 800; letter-spacing: -0.3px; color: #ffffff; }
+        .brand-subtitle { font-size: 0.82rem; opacity: 0.85; font-weight: 500; }
+        
+        .sync-badge { 
+            font-size: 0.78rem; 
+            padding: 6px 10px; 
+            border-radius: 20px; 
+            background: rgba(255,255,255,0.15); 
+            font-weight: 700; 
+            display: flex; 
+            align-items: center; 
+            gap: 6px; 
+            transition: all 0.3s ease;
+            text-align: right;
+            max-width: 170px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            height: 72px;
+            background: var(--bg-card);
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            z-index: 200;
+            box-shadow: 0 -4px 16px rgba(0,0,0,0.06);
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+
+        .nav-button {
+            flex: 1; height: 100%; background: transparent; border: none;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            gap: 4px; color: var(--text-muted); font-size: 0.75rem; font-weight: 700; cursor: pointer;
+            transition: color 0.2s ease;
+        }
+        .nav-button .nav-icon { font-size: 1.3rem; }
+        .nav-button.active { color: var(--primary); background: var(--primary-light); border-top: 3px solid var(--primary); }
+
+        .container { padding: 16px; max-width: 600px; margin: 0 auto; width: 100%; flex: 1; }
+        .card { background: var(--bg-card); border-radius: var(--radius-md); padding: 16px; margin-bottom: 16px; box-shadow: var(--shadow-sm); border: 1px solid var(--border); }
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .card h2 { font-size: 1.15rem; color: var(--primary); display: flex; align-items: center; gap: 8px; font-weight: 800; margin-bottom: 12px; }
+
+        .form-group { margin-bottom: 14px; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        label { display: block; margin-bottom: 6px; font-weight: 700; font-size: 0.85rem; color: var(--text-main); }
+        
+        input, select { 
+            width: 100%; padding: 14px; border: 1.5px solid var(--border); border-radius: var(--radius-sm); 
+            font-size: 1rem; background: #ffffff; color: var(--text-main); outline: none; 
+            appearance: none; font-weight: 600; transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        input:focus, select:focus { border-color: var(--border-focus); box-shadow: 0 0 0 3px rgba(20, 83, 45, 0.12); }
+        .large-touch { min-height: 52px; }
+        
+        .activity-row { background: var(--bg-app); border: 1.5px solid var(--border); border-radius: var(--radius-md); padding: 14px; margin-bottom: 12px; transition: border-color 0.2s; }
+        .activity-row-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding-bottom: 6px; border-bottom: 1px solid var(--border); }
+        .activity-row-title { font-size: 0.8rem; font-weight: 800; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px; }
+        
+        .btn-small { min-height: 44px; padding: 0 16px; border-radius: var(--radius-sm); border: none; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .btn-edit { background: var(--primary); color: white; }
+        .btn-delete { background: var(--error-light); color: var(--error); border: 1px solid var(--error); }
+        
+        .remove-btn { background: var(--error-light); color: var(--error); border: none; border-radius: var(--radius-sm); width: 40px; height: 40px; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .relative-wrapper { position: relative; }
+        .autocomplete-suggestions { position: absolute; top: 100%; left: 0; right: 0; background: #ffffff; border: 2px solid var(--primary); border-radius: var(--radius-sm); margin-top: 4px; max-height: 220px; overflow-y: auto; z-index: 1000; box-shadow: var(--shadow-md); }
+        .autocomplete-suggestion { padding: 12px 14px; border-bottom: 1px solid var(--border); font-size: 0.9rem; cursor: pointer; font-weight: 600; }
+        .autocomplete-suggestion:active { background: var(--primary-light); }
+        .suggestion-hint { font-size: 0.8rem; color: var(--primary); margin-top: 6px; font-weight: 700; text-align: right; }
+
+        button.action-btn { width: 100%; padding: 14px; border-radius: var(--radius-md); border: none; font-size: 1rem; font-weight: 800; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px; min-height: 52px; transition: transform 0.1s, opacity 0.2s, background-color 0.2s; }
+        button.action-btn:active:not(:disabled) { transform: scale(0.98); }
+        button.action-btn:disabled { opacity: 0.45; cursor: not-allowed; filter: grayscale(0.6); }
+        
+        button.primary { background: var(--primary); color: white; }
+        button.primary:hover:not(:disabled) { background: var(--primary-hover); }
+        button.success { background: var(--success); color: white; }
+        button.warning { background: var(--warning); color: white; }
+        button.secondary { background: var(--border); color: var(--text-main); }
+        .large-action { font-size: 1.05rem; min-height: 56px; text-transform: uppercase; letter-spacing: 0.5px; box-shadow: 0 4px 12px rgba(22, 163, 74, 0.25); }
+
+        .status-banner { padding: 12px 14px; border-radius: var(--radius-sm); background: var(--primary-light); border-left: 4px solid var(--primary); color: var(--primary); font-size: 0.9rem; line-height: 1.4; margin-bottom: 12px; font-weight: 600; }
+        
+        .stat-grid-4 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 16px; }
+        .stat-card { background: var(--bg-app); border: 1px solid var(--border); padding: 14px 10px; border-radius: var(--radius-md); text-align: center; }
+        .stat-value { font-size: 1.4rem; font-weight: 900; color: var(--primary); }
+        .stat-label { font-size: 0.75rem; color: var(--text-muted); font-weight: 800; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+        .filters-group { display: flex; flex-direction: column; gap: 10px; margin-bottom: 14px; }
+        .filters-group select, .filters-group input { padding: 10px 12px; font-size: 0.85rem; min-height: 44px; }
+        .filters-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+        .toast-notification { position: fixed; bottom: 85px; left: 50%; transform: translateX(-50%) translateY(150px); background: var(--success); color: white; padding: 14px 20px; border-radius: 30px; font-weight: 800; font-size: 0.95rem; box-shadow: 0 8px 20px rgba(0,0,0,0.2); transition: transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 1000; display: flex; align-items: center; gap: 10px; width: 90%; max-width: 380px; justify-content: center; }
+        .toast-notification.show { transform: translateX(-50%) translateY(0); }
+
+        .table-wrapper { overflow-x: auto; border-radius: var(--radius-sm); border: 1px solid var(--border); margin-bottom: 14px; }
+        table { width: 100%; border-collapse: collapse; background: #fff; }
+        th, td { padding: 12px; text-align: left; font-size: 0.85rem; border-bottom: 1px solid var(--border); white-space: nowrap; }
+        th { background: #f1f5f9; color: var(--text-main); font-weight: 800; }
+        td strong { color: var(--primary); }
+        
+        .status-badge { padding: 4px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: 700; display: inline-block; }
+        .status-success { background: var(--success-light); color: var(--success); }
+        .status-warning { background: var(--warning-light); color: var(--warning); }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .search-drawer { margin-bottom: 14px; background: #ffffff; border: 1.5px dashed var(--primary); border-radius: var(--radius-md); padding: 12px; }
+        #capture-container { position: absolute; left: -9999px; top: 0; width: 900px; background: white; padding: 30px; }
+        
+        .sync-info-list { list-style: none; display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+        .sync-info-item { display: flex; justify-content: space-between; font-size: 0.9rem; padding: 10px; background: var(--bg-app); border-radius: var(--radius-sm); border: 1px solid var(--border); }
+        .sync-info-item span:first-child { color: var(--text-muted); font-weight: 600; }
+        .sync-info-item span:last-child { font-weight: 800; color: var(--text-main); }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="header-brand">
+        <span class="brand-logo">🌿 Canopy Madagascar</span>
+        <span class="brand-subtitle">Suivi d'activités</span>
+    </div>
+    <div id="sync-status" class="sync-badge">🟢 Synchronisé</div>
+</header>
+
+<div class="container">
+
+    <!-- TAB 1 : SAISIE -->
+    <div id="tab-saisie" class="tab-content active">
+        
+        <div class="search-drawer">
+            <label style="margin-bottom:4px;">🔍 Catalogue & Recherche Rapide</label>
+            <div class="relative-wrapper">
+                <input type="text" id="search-code" class="act-code" inputmode="search" oninput="suggestCode(this)" onfocus="suggestCode(this)" placeholder="Rechercher une tâche par nom ou code...">
+                <div class="autocomplete-suggestions"></div>
+            </div>
+            <div id="consultation-result" style="margin-top:8px; font-weight:700; font-size:0.85rem; color:var(--primary); padding:8px; background:var(--primary-light); border-radius:6px; display:none;"></div>
+        </div>
+
+        <div class="card">
+            <div class="card-header"><h2 style="margin:0;">📋 Informations de terrain</h2></div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>📅 Date</label>
+                    <input type="date" id="input-saisie-date" onchange="onOuvrierOrDateChange()" class="large-touch">
+                </div>
+                <div class="form-group">
+                    <label>📍 Projet</label>
+                    <input type="text" id="input-saisie-projet" placeholder="Ex: Canopy" class="large-touch">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>🗺️ Parcelle</label>
+                    <input type="text" id="input-saisie-parcelle" placeholder="Ex: Lot 2" class="large-touch">
+                </div>
+                <div class="form-group">
+                    <label>👥 Équipe</label>
+                    <select id="select-global-chef" onchange="onChefChange()" class="large-touch"></select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>👷‍♂️ Ouvrier</label>
+                <select id="select-ouvrier" onchange="onOuvrierOrDateChange()" class="large-touch"></select>
+            </div>
+            <div id="worker-status-banner" class="status-banner">Veuillez sélectionner un ouvrier.</div>
+        </div>
+
+        <div class="card">
+            <h2>✍️ Activités réalisées</h2>
+            <div id="activities-container"></div>
+            <button type="button" class="action-btn secondary" onclick="addActivityRow()" style="margin-bottom: 16px; border: 2px dashed var(--primary); background: transparent; color: var(--primary);">
+                ➕ Ajouter une activité
+            </button>
+            <button onclick="enregistrerSaisie()" class="action-btn success large-action">
+                ✓ ENREGISTRER POUR CET OUVRIER
+            </button>
+        </div>
+    </div>
+
+    <!-- TAB 2 : TABLEAU DE BORD AVANCÉ & ÉDITION -->
+    <div id="tab-dashboard" class="tab-content">
+        
+        <div class="card">
+            <h2 style="margin-bottom: 12px; font-size:1.05rem;">⚙️ Filtres multicritères</h2>
+            <div class="filters-group">
+                <select id="filter-period" onchange="onPeriodChange()">
+                    <option value="today">Aujourd'hui</option>
+                    <option value="week">Cette semaine</option>
+                    <option value="month">Ce mois</option>
+                    <option value="custom">Période personnalisée...</option>
+                </select>
+                
+                <div id="custom-date-range" class="filters-grid" style="display:none;">
+                    <input type="date" id="filter-start" onchange="rafraichirDashboard()">
+                    <input type="date" id="filter-end" onchange="rafraichirDashboard()">
+                </div>
+                
+                <div class="filters-grid">
+                    <select id="filter-projet" onchange="rafraichirDashboard()"><option value="">Tous les projets</option></select>
+                    <select id="filter-parcelle" onchange="rafraichirDashboard()"><option value="">Toutes les parcelles</option></select>
+                </div>
+                <div class="filters-grid">
+                    <select id="filter-equipe" onchange="rafraichirDashboard()"><option value="">Toutes les équipes</option></select>
+                    <select id="filter-ouvrier" onchange="rafraichirDashboard()"><option value="">Tous les ouvriers</option></select>
+                </div>
+                <select id="filter-activite" onchange="rafraichirDashboard()"><option value="">Toutes les activités</option></select>
+            </div>
+        </div>
+
+        <div class="stat-grid-4">
+            <div class="stat-card">
+                <div class="stat-value" id="kpi-ouvriers">0</div>
+                <div class="stat-label">👷 Ouvriers actifs</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="kpi-activites">0</div>
+                <div class="stat-label">📋 Activités saisies</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="kpi-plants">0</div>
+                <div class="stat-label">🌱 Plants réalisés</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="kpi-total">0.00</div>
+                <div class="stat-label">📊 Total Unités</div>
+            </div>
+        </div>
+
+        <!-- SECTION : SYNTHÈSE PAR TÂCHE -->
+        <div class="card">
+            <h2>📈 Synthèse par Tâche saisie</h2>
+            <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:10px;">Récapitulatif des effectifs et réalisations totales pour la période filtrée.</p>
+            <div class="table-wrapper">
+                <table id="table-synthese-taches">
+                    <thead>
+                        <tr>
+                            <th>Tâche</th>
+                            <th>Effectif</th>
+                            <th>Réalisation</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tb-synthese-taches"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- SECTION : ÉDITION DES SAISIES -->
+        <div class="card">
+            <h2>✏️ Détail et Édition des saisies</h2>
+            <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:14px;">Les lignes non synchronisées peuvent être modifiées ou supprimées. Les lignes synchronisées 🔒 sont définitives.</p>
+            
+            <div id="liste-edition-saisies">
+                <!-- Généré via JS -->
+            </div>
+        </div>
+
+        <div class="card" style="margin-bottom: 24px;">
+            <h2>🏆 Performance Individuelle (Export)</h2>
+            <div class="table-wrapper">
+                <table id="table-performance">
+                    <thead>
+                        <tr id="th-performance"></tr>
+                    </thead>
+                    <tbody id="tb-performance"></tbody>
+                </table>
+            </div>
+            <button onclick="capturerRapport()" class="action-btn warning" style="margin-top:14px;">📸 Exporter le Bilan en Image</button>
+        </div>
+    </div>
+
+    <!-- TAB 3 : SYNCHRONISATION -->
+    <div id="tab-sync" class="tab-content">
+        <div class="card">
+            <h2>🔄 État de la Synchronisation</h2>
+            <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:12px;">Contrôle de la persistance locale et transfert vers Google Sheets.</p>
+            
+            <ul class="sync-info-list">
+                <li class="sync-info-item">
+                    <span>État de connexion</span>
+                    <span id="sync-info-connection">Vérification...</span>
+                </li>
+                <li class="sync-info-item">
+                    <span>Données locales stockées</span>
+                    <span id="sync-info-local">0</span>
+                </li>
+                <li class="sync-info-item">
+                    <span>Données en attente</span>
+                    <span id="sync-info-pending" style="color:var(--warning);">0</span>
+                </li>
+                <li class="sync-info-item">
+                    <span>Dernière synchronisation</span>
+                    <span id="sync-info-last-time">Aucune</span>
+                </li>
+                <li class="sync-info-item" id="sync-error-row">
+                    <span>Dernière erreur</span>
+                    <span id="sync-info-last-error" style="color:var(--error);">Aucune</span>
+                </li>
+            </ul>
+
+            <button id="btn-sync-now" onclick="synchroniserDonnees()" class="action-btn primary" style="margin-bottom:10px;">
+                🔄 Synchroniser maintenant
+            </button>
+            <button onclick="chargerReferentiels()" class="action-btn secondary">
+                📥 Mettre à jour les référentiels
+            </button>
+        </div>
+    </div>
+
+</div>
+
+<nav class="bottom-nav">
+    <button class="nav-button active" id="btn-nav-saisie" onclick="switchTab('tab-saisie', this)">
+        <span class="nav-icon">📋</span>
+        <span>Saisie</span>
+    </button>
+    <button class="nav-button" id="btn-nav-dashboard" onclick="switchTab('tab-dashboard', this)">
+        <span class="nav-icon">📊</span>
+        <span>Bilan</span>
+    </button>
+    <button class="nav-button" id="btn-nav-sync" onclick="switchTab('tab-sync', this)">
+        <span class="nav-icon">🔄</span>
+        <span>Synchro</span>
+    </button>
+</nav>
+
+<div id="capture-container"></div>
+
+<script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby3to942EW3_6UaNO76a1b0LNDrTQaSRQCFhZYBewolTslE54KzIQQAwTvLVvnzZkIi-g/exec";
+    const MAX_TACHES_JOUR = 2; 
+    
+    let appState = { 
+        taches: [], 
+        ouvriers: [], 
+        saisies: [], 
+        activeChef: "",
+        isSyncing: false,
+        lastError: null
+    };
+    let activityCount = 0;
+    let isFilterInit = false;
+
+    window.onload = async () => {
+        const todayStr = new Date().toISOString().split('T')[0];
+        document.getElementById('input-saisie-date').value = todayStr;
+        
+        chargerStockageLocal();
+        migrerAnciennesDonneesLocales();
+        await chargerReferentiels();
+        initialiserUI();
+    };
+
+    window.addEventListener('DOMContentLoaded', () => {
+        addActivityRow(); 
+    });
+
+    function chargerStockageLocal() {
+        appState.taches = JSON.parse(localStorage.getItem('ref_taches') || '[]');
+        appState.ouvriers = JSON.parse(localStorage.getItem('ref_ouvriers') || '[]');
+        appState.saisies = JSON.parse(localStorage.getItem('saisies_hors_ligne') || '[]');
+        appState.lastError = localStorage.getItem('last_sync_error') || null;
+    }
+
+    // Gère la transition vers les nouveaux champs Projet et Parcelle séparés
+    function migrerAnciennesDonneesLocales() {
+        let modifie = false;
+        appState.saisies = appState.saisies.map(record => {
+            if (record.parcelle === undefined || !record.timestamp || record.synced === undefined || !record.id) {
+                modifie = true;
+                return {
+                    id: record.id || ('S_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4)),
+                    dateTravail: record.dateTravail || new Date().toISOString().split('T')[0],
+                    projetParcelle: record.projetParcelle || record.projet || "Canopy", // Conservation pour rétrocompatibilité backend
+                    projet: record.projet || record.projetParcelle || "Canopy",
+                    parcelle: record.parcelle || "",
+                    chefEquipe: record.chefEquipe || record.equipe || "Non défini",
+                    nomOuvrier: record.nomOuvrier || record.ouvrier || "Inconnu",
+                    tache: record.tache || record.activite || "Tâche générale",
+                    quantite: Number(record.quantite) || 0,
+                    taches: Number(record.taches) || 0,
+                    montantAr: Number(record.montantAr) || 0,
+                    synced: record.synced !== undefined ? record.synced : true,
+                    timestamp: record.timestamp || Date.now()
+                };
+            }
+            return record;
+        });
+        if (modifie) {
+            localStorage.setItem('saisies_hors_ligne', JSON.stringify(appState.saisies));
+        }
+    }
+
+    async function chargerReferentiels() {
+        if (!navigator.onLine) {
+            rafraichirEtatSync();
+            return;
+        }
+        try {
+            const res = await fetch(SCRIPT_URL);
+            const data = await res.json();
+
+            if (data.status === "success") {
+                if (data.taches && data.taches.length > 0) {
+                    appState.taches = data.taches.map(row => ({
+                        code: String(row[0] || '').trim(),       
+                        desc: String(row[1] || '').trim(),       
+                        quota: parseFloat(row[2]) || 0,          
+                        unite: String(row[3] || '').trim(),      
+                        prix: parseFloat(row[4]) || 8000         
+                    })).filter(t => t.code && t.code.toLowerCase() !== 'id_tache');
+                    localStorage.setItem('ref_taches', JSON.stringify(appState.taches));
+                }
+                if (data.ouvriers && data.ouvriers.length > 0) {
+                    appState.ouvriers = data.ouvriers.map(row => ({
+                        id: String(row[0] || '').trim(),         
+                        nom: String(row[1] || '').trim(),        
+                        chef: String(row[2] || '').trim(),       
+                        statut: String(row[3] || '').trim()      
+                    })).filter(o => o.nom && o.id.toLowerCase() !== 'id_ouvrier' && o.statut.toLowerCase() !== 'inactif');
+                    localStorage.setItem('ref_ouvriers', JSON.stringify(appState.ouvriers));
+                }
+                initialiserUI();
+                initDashboardFilters();
+            }
+        } catch (e) {
+            // Utilisation cache local
+        } finally {
+            rafraichirEtatSync();
+        }
+    }
+
+    function initialiserUI() {
+        const selectChef = document.getElementById('select-global-chef');
+        const ancienChef = selectChef.value;
+        selectChef.innerHTML = '';
+        const chefs = [...new Set(appState.ouvriers.map(o => o.chef).filter(Boolean))];
+        if (chefs.length === 0) chefs.push("Aucun Chef");
+        chefs.forEach(chef => { selectChef.innerHTML += `<option value="${chef}">${chef}</option>`; });
+        if (ancienChef && chefs.includes(ancienChef)) selectChef.value = ancienChef;
+        appState.activeChef = selectChef.value;
+        onChefChange();
+        rafraichirEtatSync();
+    }
+
+    function onChefChange() {
+        appState.activeChef = document.getElementById('select-global-chef').value;
+        const selectOuvrier = document.getElementById('select-ouvrier');
+        selectOuvrier.innerHTML = '';
+        appState.ouvriers.filter(o => o.chef === appState.activeChef).forEach(o => {
+            selectOuvrier.innerHTML += `<option value="${o.nom}">${o.nom}</option>`;
+        });
+        onOuvrierOrDateChange();
+    }
+
+    function onOuvrierOrDateChange() {
+        const ouvrier = document.getElementById('select-ouvrier').value;
+        const date = document.getElementById('input-saisie-date').value;
+        const banner = document.getElementById('worker-status-banner');
+        if (!ouvrier || !date) { banner.innerText = "Sélectionnez un ouvrier."; return; }
+
+        const stats = toutTachesDuJourOuvrier(ouvrier, date);
+        const reste = Math.max(0, MAX_TACHES_JOUR - stats.taches);
+
+        banner.innerHTML = `<strong>${ouvrier}</strong><br>` +
+                           `Validé : <strong>${stats.taches.toFixed(2)} / ${MAX_TACHES_JOUR} Unités</strong> (${stats.ar.toLocaleString()} Ar)<br>` +
+                           `<span style="color:var(--primary);">Plafond restant : <strong>${reste.toFixed(2)} Unités</strong></span>`;
+        recalculerLignes();
+    }
+
+    function toutTachesDuJourOuvrier(ouvrier, date) {
+        let t = 0, ar = 0;
+        appState.saisies.forEach(s => {
+            if (s.nomOuvrier === ouvrier && s.dateTravail === date) { t += (s.taches || 0); ar += (s.montantAr || 0); }
+        });
+        return { taches: t, ar: ar };
+    }
+
+    function addActivityRow(tacheVal = '', qteVal = '', dataValid = 'false', quotaVal = '', prixVal = '') {
+        activityCount++;
+        const container = document.getElementById('activities-container');
+        const row = document.createElement('div');
+        row.className = 'activity-row';
+        
+        const deleteBtnHTML = activityCount > 1 
+            ? `<button type="button" class="remove-btn" onclick="this.closest('.activity-row').remove(); recalculerLignes();">🗑️</button>` 
+            : `<div></div>`;
+
+        row.innerHTML = `
+            <div class="activity-row-header">
+                <div class="activity-row-title">Activité ${activityCount}</div>
+                ${deleteBtnHTML}
+            </div>
+            <div class="form-group relative-wrapper">
+                <label>Type d'activité</label>
+                <input type="text" class="act-code large-touch" inputmode="search" 
+                       data-valid="${dataValid}" data-quota="${quotaVal}" data-prix="${prixVal}" value="${tacheVal}" 
+                       placeholder="Rechercher..." oninput="suggestCode(this)" onfocus="suggestCode(this)">
+                <div class="autocomplete-suggestions"></div>
+            </div>
+            <div class="form-group" style="margin-bottom: 0;">
+                <label>Quantité réalisée</label>
+                <input type="number" class="act-real large-touch" inputmode="decimal" pattern="[0-9]*" min="0" step="any" 
+                       value="${qteVal}" placeholder="Ex: 80" oninput="recalculerLignes()">
+                <div class="suggestion-hint"></div>
+            </div>
+        `;
+        container.appendChild(row);
+    }
+
+    function suggestCode(inp) {
+        inp.setAttribute('data-valid', 'false');
+        const val = (inp.value || '').toLowerCase().trim();
+        const suggestionsDiv = inp.parentElement.querySelector('.autocomplete-suggestions');
+        if (!suggestionsDiv) return;
+        suggestionsDiv.innerHTML = '';
+        if (!appState.taches.length) return;
+
+        appState.taches.filter(t => String(t.code + " " + t.desc).toLowerCase().includes(val)).slice(0, 10).forEach(m => {
+            const div = document.createElement('div');
+            div.className = 'autocomplete-suggestion';
+            div.innerHTML = `<strong>${m.code}</strong> - ${m.desc}<br><span style="color:var(--text-muted); font-size:0.75rem;">Quota: ${m.quota} ${m.unite}</span>`;
+            div.onclick = (e) => {
+                e.stopPropagation();
+                inp.value = `${m.code} - ${m.desc}`;
+                inp.setAttribute('data-code', m.code);
+                inp.setAttribute('data-quota', m.quota);
+                inp.setAttribute('data-prix', m.prix);
+                inp.setAttribute('data-valid', 'true');
+                suggestionsDiv.innerHTML = '';
+                
+                if(inp.id === 'search-code') {
+                    const res = document.getElementById('consultation-result');
+                    res.style.display = 'block';
+                    res.innerHTML = `Quota (1 unité) : <strong>${m.quota} ${m.unite}</strong> | Prix : <strong>${m.prix} Ar</strong>`;
+                } else { recalculerLignes(); }
+            };
+            suggestionsDiv.appendChild(div);
+        });
+    }
+
+    document.addEventListener('click', (e) => {
+        if (!e.target.classList.contains('act-code') && !e.target.closest('.autocomplete-suggestions')) {
+            document.querySelectorAll('.autocomplete-suggestions').forEach(div => div.innerHTML = '');
+        }
+    });
+
+    function recalculerLignes() {
+        const ouvrier = document.getElementById('select-ouvrier').value;
+        const date = document.getElementById('input-saisie-date').value;
+        if (!ouvrier || !date) return;
+        const stats = toutTachesDuJourOuvrier(ouvrier, date);
+
+        document.querySelectorAll('#activities-container .activity-row').forEach((row, idx) => {
+            const quota = parseFloat(row.querySelector('.act-code').getAttribute('data-quota'));
+            const hint = row.querySelector('.suggestion-hint');
+            if (isNaN(quota) || quota <= 0) { hint.innerText = ''; return; }
+
+            let autresFractions = 0;
+            document.querySelectorAll('#activities-container .activity-row').forEach((rOther, rIdx) => {
+                if (rIdx !== idx) {
+                    const qO = parseFloat(rOther.querySelector('.act-code').getAttribute('data-quota'));
+                    const rO = parseFloat(rOther.querySelector('.act-real').value);
+                    if (!isNaN(qO) && qO > 0 && !isNaN(rO)) autresFractions += (rO / qO);
+                }
+            });
+            const maxQt = Math.round(Math.max(0, MAX_TACHES_JOUR - stats.taches - autresFractions) * quota * 100) / 100;
+            hint.innerHTML = `Max conseillé : ${maxQt}`;
+        });
+    }
+
+    function enregistrerSaisie() {
+        const ouvrier = document.getElementById('select-ouvrier').value;
+        const date = document.getElementById('input-saisie-date').value;
+        const projet = document.getElementById('input-saisie-projet').value.trim() || "Non spécifié";
+        const parcelle = document.getElementById('input-saisie-parcelle').value.trim() || "";
+        
+        if (!ouvrier || !date) {
+            showToast("Sélectionnez un ouvrier et une date.", "error");
+            return;
+        }
+
+        let totalFractions = 0, elements = [], erreur = false;
+        document.querySelectorAll('#activities-container .activity-row').forEach(row => {
+            const inp = row.querySelector('.act-code');
+            const codeTxt = inp.value;
+            const quota = parseFloat(inp.getAttribute('data-quota'));
+            const prix = parseFloat(inp.getAttribute('data-prix')) || 8000;
+            const real = parseFloat(row.querySelector('.act-real').value);
+
+            if (codeTxt && inp.getAttribute('data-valid') !== 'true') {
+                showToast(`Veuillez sélectionner "${codeTxt}" dans le catalogue.`, "error");
+                erreur = true;
+            }
+            if (!erreur && codeTxt && !isNaN(quota) && quota > 0 && !isNaN(real) && real > 0) {
+                totalFractions += (real / quota);
+                elements.push({ tache: codeTxt, quantite: real, quota: quota, prix: prix });
+            }
+        });
+
+        if (erreur) return;
+        if (!elements.length) {
+            showToast("Renseignez au moins une tâche valide.", "warning");
+            return;
+        }
+
+        const stats = toutTachesDuJourOuvrier(ouvrier, date);
+        const dispo = MAX_TACHES_JOUR - stats.taches;
+        if (dispo <= 0) {
+            showToast("Quota journalier atteint pour cet ouvrier.", "error");
+            return;
+        }
+
+        const ratio = totalFractions > dispo ? (dispo / totalFractions) : 1;
+        
+        elements.forEach(el => {
+            const qte = el.quantite * ratio;
+            const t = qte / el.quota;
+            appState.saisies.push({
+                id: 'S_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
+                dateTravail: date, 
+                projetParcelle: projet, // Rétrocompatibilité avec d'anciens codes
+                projet: projet, 
+                parcelle: parcelle, 
+                chefEquipe: appState.activeChef, 
+                nomOuvrier: ouvrier,
+                tache: el.tache, 
+                quantite: qte, 
+                taches: t, 
+                montantAr: Math.round(t * el.prix), 
+                synced: false,
+                timestamp: Date.now()
+            });
+        });
+
+        localStorage.setItem('saisies_hors_ligne', JSON.stringify(appState.saisies));
+        
+        showToast(ratio < 1 ? `Enregistré localement (Ajusté)` : `Enregistré pour ${ouvrier} !`, "success");
+        
+        document.getElementById('activities-container').innerHTML = '';
+        activityCount = 0;
+        addActivityRow();
+
+        onOuvrierOrDateChange(); 
+        rafraichirEtatSync();
+        initDashboardFilters();
+        
+        if(navigator.onLine) {
+            synchroniserDonnees(true);
+        }
+    }
+
+    function showToast(message, type = 'success') {
+        let toast = document.getElementById('app-toast');
+        if (!toast) {
+            toast = document.createElement('div'); toast.id = 'app-toast';
+            toast.className = 'toast-notification'; document.body.appendChild(toast);
+        }
+        let icon = type === 'error' ? '✕' : (type === 'warning' ? '⚠' : '✓');
+        toast.innerHTML = `<span>${icon}</span> ${message}`;
+        toast.style.background = type === 'error' ? 'var(--error)' : (type === 'warning' ? 'var(--warning)' : 'var(--success)');
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+
+    function onPeriodChange() {
+        const p = document.getElementById('filter-period').value;
+        const customDiv = document.getElementById('custom-date-range');
+        customDiv.style.display = (p === 'custom') ? 'grid' : 'none';
+        rafraichirDashboard();
+    }
+
+    function getDateRange() {
+        const period = document.getElementById('filter-period').value;
+        const today = new Date();
+        let start = new Date(today);
+        let end = new Date(today);
+
+        if (period === 'week') {
+            const day = today.getDay();
+            const diff = today.getDate() - day + (day === 0 ? -6 : 1);
+            start = new Date(today.setDate(diff));
+            end = new Date(start);
+            end.setDate(end.getDate() + 6);
+        } else if (period === 'month') {
+            start = new Date(today.getFullYear(), today.getMonth(), 1);
+            end = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+        } else if (period === 'custom') {
+            const sVal = document.getElementById('filter-start').value;
+            const eVal = document.getElementById('filter-end').value;
+            if(sVal) start = new Date(sVal);
+            if(eVal) end = new Date(eVal);
+        }
+        
+        return { 
+            start: start.toISOString().split('T')[0], 
+            end: end.toISOString().split('T')[0] 
+        };
+    }
+
+    function initDashboardFilters() {
+        if(!isFilterInit) {
+            const todayStr = new Date().toISOString().split('T')[0];
+            document.getElementById('filter-start').value = todayStr;
+            document.getElementById('filter-end').value = todayStr;
+            isFilterInit = true;
+        }
+
+        const peupleSelect = (id, options, labelAll) => {
+            const sel = document.getElementById(id);
+            const val = sel.value;
+            sel.innerHTML = `<option value="">${labelAll}</option>` + options.map(o => `<option value="${o}">${o}</option>`).join('');
+            sel.value = val || "";
+        };
+
+        // Séparation des filtres Projet et Parcelle
+        peupleSelect('filter-projet', [...new Set(appState.saisies.map(s => s.projet || s.projetParcelle).filter(Boolean))], "Tous les projets");
+        peupleSelect('filter-parcelle', [...new Set(appState.saisies.map(s => s.parcelle).filter(Boolean))], "Toutes les parcelles");
+        peupleSelect('filter-equipe', [...new Set(appState.ouvriers.map(o => o.chef).filter(Boolean))], "Toutes les équipes");
+        peupleSelect('filter-ouvrier', [...new Set(appState.ouvriers.map(o => o.nom).filter(Boolean))], "Tous les ouvriers");
+        peupleSelect('filter-activite', [...new Set(appState.saisies.map(s => s.tache).filter(Boolean))], "Toutes les activités");
+    }
+
+    function rafraichirDashboard() {
+        const { start, end } = getDateRange();
+        const fProjet = document.getElementById('filter-projet').value;
+        const fParcelle = document.getElementById('filter-parcelle').value;
+        const fEquipe = document.getElementById('filter-equipe').value;
+        const fOuvrier = document.getElementById('filter-ouvrier').value;
+        const fActivite = document.getElementById('filter-activite').value;
+
+        // FILTRAGE PRINCIPAL
+        const fData = appState.saisies.filter(s => {
+            let pass = true;
+            if (s.dateTravail < start || s.dateTravail > end) pass = false;
+            // Vérification sur projet et parcelle séparés
+            if (fProjet && (s.projet || s.projetParcelle) !== fProjet) pass = false;
+            if (fParcelle && s.parcelle !== fParcelle) pass = false;
+            if (fEquipe && s.chefEquipe !== fEquipe) pass = false;
+            if (fOuvrier && s.nomOuvrier !== fOuvrier) pass = false;
+            if (fActivite && s.tache !== fActivite) pass = false;
+            return pass;
+        });
+
+        // MISE À JOUR DES KPIs
+        document.getElementById('kpi-ouvriers').innerText = new Set(fData.map(s => s.nomOuvrier)).size;
+        document.getElementById('kpi-activites').innerText = fData.length;
+        document.getElementById('kpi-plants').innerText = Math.round(fData.filter(s => s.tache.toLowerCase().includes('plant')).reduce((sum, s) => sum + s.quantite, 0)).toLocaleString();
+        document.getElementById('kpi-total').innerText = fData.reduce((sum, s) => sum + (s.taches || 0), 0).toFixed(2);
+
+        // 1. SYNTHÈSE PAR TÂCHE
+        let syntheseTaches = {};
+        fData.forEach(s => {
+            let shortName = s.tache.split(' - ')[0];
+            if (!syntheseTaches[shortName]) {
+                syntheseTaches[shortName] = { ouvriers: new Set(), quantite: 0, nomComplet: s.tache };
+            }
+            syntheseTaches[shortName].ouvriers.add(s.nomOuvrier);
+            syntheseTaches[shortName].quantite += s.quantite;
+        });
+
+        let tbSynthese = '';
+        const sortedTasksArr = Object.entries(syntheseTaches).sort((a,b) => b[1].quantite - a[1].quantite);
+        
+        sortedTasksArr.forEach(([code, data]) => {
+            tbSynthese += `<tr>
+                <td title="${data.nomComplet}"><strong>${code}</strong></td>
+                <td>${data.ouvriers.size} 👷</td>
+                <td><strong>${data.quantite.toFixed(2).replace(/\.00$/, '')}</strong></td>
+            </tr>`;
+        });
+        if(!tbSynthese) tbSynthese = '<tr><td colspan="3">Aucune donnée sur cette période.</td></tr>';
+        document.getElementById('tb-synthese-taches').innerHTML = tbSynthese;
+
+        // 2. DÉTAIL ET ÉDITION DES SAISIES
+        const divEdition = document.getElementById('liste-edition-saisies');
+        divEdition.innerHTML = '';
+        
+        if (fData.length === 0) {
+            divEdition.innerHTML = '<p style="color:var(--text-muted); font-size:0.9rem;">Aucune saisie à afficher.</p>';
+        } else {
+            // Afficher de la plus récente à la plus ancienne
+            const sortedSaisies = [...fData].sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp));
+            
+            sortedSaisies.forEach(s => {
+                const isSynced = s.synced;
+                
+                let cardHTML = `
+                <div class="activity-row" style="margin-bottom:12px; border-color: ${isSynced ? 'var(--border)' : 'var(--warning)'}; border-left-width: 4px; border-left-color: ${isSynced ? 'var(--success)' : 'var(--warning)'};">
+                    <div style="display:flex; justify-content:space-between; margin-bottom:8px; align-items:center;">
+                        <strong style="font-size:0.95rem; color:var(--text-main);">${s.nomOuvrier}</strong>
+                        <span class="status-badge ${isSynced ? 'status-success' : 'status-warning'}">
+                            ${isSynced ? '🔒 Synchro' : '⏳ Attente'}
+                        </span>
+                    </div>
+                    <div style="font-size:0.8rem; color:var(--text-muted); margin-bottom:12px; line-height:1.4;">
+                        📅 ${s.dateTravail} | 📍 Projet: ${s.projet || s.projetParcelle} | 🗺️ Parcelle: ${s.parcelle || '-'} <br>
+                        📋 <strong>${s.tache}</strong>
+                    </div>
+                `;
+
+                if (isSynced) {
+                    cardHTML += `<div style="font-weight:800; font-size:1rem; color:var(--primary);">Réalisation : ${s.quantite}</div>`;
+                } else {
+                    cardHTML += `
+                    <div style="display:flex; gap:8px; align-items:center;">
+                        <input type="number" id="edit-qte-${s.id}" value="${s.quantite}" class="large-touch" style="flex:1; min-height:44px; padding:10px;" step="any" min="0">
+                        <button onclick="mettreAJourSaisie('${s.id}')" class="btn-small btn-edit" title="Enregistrer">💾</button>
+                        <button onclick="supprimerSaisie('${s.id}')" class="btn-small btn-delete" title="Supprimer">🗑️</button>
+                    </div>`;
+                }
+                cardHTML += `</div>`;
+                divEdition.innerHTML += cardHTML;
+            });
+        }
+
+        // 3. TABLEAU CROISÉ (PERFORMANCE INDIVIDUELLE)
+        const topTasksNames = sortedTasksArr.slice(0, 4).map(t => t[0]);
+        let thHTML = `<th>Ouvrier</th>`;
+        topTasksNames.forEach(t => thHTML += `<th>${t.substring(0,8)}</th>`);
+        thHTML += `<th>Autres</th><th>Total U.</th>`;
+        document.getElementById('th-performance').innerHTML = thHTML;
+
+        let ouvrierData = {};
+        fData.forEach(s => {
+            if(!ouvrierData[s.nomOuvrier]) ouvrierData[s.nomOuvrier] = { taches: {}, totalU: 0 };
+            let shortName = s.tache.split(' - ')[0];
+            ouvrierData[s.nomOuvrier].taches[shortName] = (ouvrierData[s.nomOuvrier].taches[shortName] || 0) + s.quantite;
+            ouvrierData[s.nomOuvrier].totalU += s.taches;
+        });
+
+        let tbHTML = '';
+        for (let ouvrier in ouvrierData) {
+            tbHTML += `<tr><td><strong>${ouvrier}</strong></td>`;
+            let autresQte = 0;
+            
+            for(let t in ouvrierData[ouvrier].taches) {
+                if(!topTasksNames.includes(t)) autresQte += ouvrierData[ouvrier].taches[t];
+            }
+
+            topTasksNames.forEach(t => {
+                let val = ouvrierData[ouvrier].taches[t] || 0;
+                tbHTML += `<td>${val > 0 ? val.toFixed(1).replace(/\.0$/, '') : '-'}</td>`;
+            });
+            
+            tbHTML += `<td>${autresQte > 0 ? autresQte.toFixed(1).replace(/\.0$/, '') : '-'}</td>`;
+            tbHTML += `<td><strong>${ouvrierData[ouvrier].totalU.toFixed(2)}</strong></td></tr>`;
+        }
+        document.getElementById('tb-performance').innerHTML = tbHTML || '<tr><td colspan="100%">Aucune donnée.</td></tr>';
+    }
+
+    // FONCTIONS D'ÉDITION DES SAISIES NON-SYNCHRONISÉES
+    function mettreAJourSaisie(id) {
+        const index = appState.saisies.findIndex(s => s.id === id);
+        if (index === -1) return;
+        
+        const saisie = appState.saisies[index];
+        if (saisie.synced) {
+            showToast("Impossible de modifier une donnée synchronisée.", "error");
+            return;
+        }
+
+        const inputQte = document.getElementById(`edit-qte-${id}`);
+        const newQte = parseFloat(inputQte.value);
+
+        if (isNaN(newQte) || newQte <= 0) {
+            showToast("Quantité invalide.", "error");
+            return;
+        }
+
+        // Déduction robuste du quota et prix d'origine
+        let quota = saisie.quantite / saisie.taches; 
+        if (isNaN(quota) || quota <= 0) {
+            const ref = appState.taches.find(t => saisie.tache.startsWith(t.code));
+            quota = ref ? ref.quota : 1;
+        }
+        let prix = saisie.montantAr / saisie.taches;
+        if (isNaN(prix) || prix <= 0) {
+            const ref = appState.taches.find(t => saisie.tache.startsWith(t.code));
+            prix = ref ? ref.prix : 8000;
+        }
+
+        // Mise à jour de l'enregistrement
+        saisie.quantite = newQte;
+        saisie.taches = newQte / quota;
+        saisie.montantAr = Math.round(saisie.taches * prix);
+
+        localStorage.setItem('saisies_hors_ligne', JSON.stringify(appState.saisies));
+        showToast("Saisie mise à jour ✅", "success");
+        
+        rafraichirDashboard();
+        rafraichirEtatSync();
+    }
+
+    function supprimerSaisie(id) {
+        const index = appState.saisies.findIndex(s => s.id === id);
+        if (index === -1) return;
+        
+        if (appState.saisies[index].synced) {
+            showToast("Impossible de supprimer une donnée synchronisée.", "error");
+            return;
+        }
+
+        if (!confirm("Voulez-vous vraiment supprimer cette ligne de réalisation ?")) return;
+
+        appState.saisies.splice(index, 1);
+        localStorage.setItem('saisies_hors_ligne', JSON.stringify(appState.saisies));
+        showToast("Saisie supprimée 🗑️", "success");
+        
+        rafraichirDashboard();
+        rafraichirEtatSync();
+    }
+
+    function rafraichirEtatSync() {
+        const totalLocal = appState.saisies.length;
+        const pendingList = appState.saisies.filter(s => !s.synced);
+        const pendingCount = pendingList.length;
+        const isOnline = navigator.onLine;
+
+        document.getElementById('sync-info-connection').innerText = isOnline ? "🟢 En ligne" : "🟠 Hors connexion";
+        document.getElementById('sync-info-local').innerText = totalLocal;
+        document.getElementById('sync-info-pending').innerText = pendingCount;
+        document.getElementById('sync-info-last-time').innerText = localStorage.getItem('last_sync_time') || "Aucune";
+        
+        const lastErr = localStorage.getItem('last_sync_error');
+        const errElem = document.getElementById('sync-info-last-error');
+        if(lastErr) {
+            errElem.innerText = lastErr;
+            errElem.style.color = "var(--error)";
+        } else {
+            errElem.innerText = "Aucune";
+            errElem.style.color = "var(--text-muted)";
+        }
+
+        const btnSync = document.getElementById('btn-sync-now');
+        if (btnSync) {
+            btnSync.disabled = (pendingCount === 0 || appState.isSyncing || !isOnline);
+        }
+
+        if (appState.isSyncing) {
+            setSyncBadge("🔵 Synchro en cours...", "var(--info)", "var(--info-light)");
+        } else if (appState.lastError && pendingCount > 0) {
+            setSyncBadge(`🔴 Erreur (${pendingCount})`, "var(--error)", "var(--error-light)");
+        } else if (!isOnline) {
+            setSyncBadge(`🟠 Hors ligne (${pendingCount})`, "var(--warning)", "var(--warning-light)");
+        } else if (pendingCount > 0) {
+            setSyncBadge(`🟠 ${pendingCount} en attente`, "var(--warning)", "var(--warning-light)");
+        } else {
+            setSyncBadge("🟢 Synchronisé", "var(--success)", "var(--success-light)");
+        }
+    }
+
+    function setSyncBadge(txt, color, bg) {
+        const b = document.getElementById('sync-status');
+        b.innerText = txt;
+        b.style.color = color;
+        b.style.background = bg;
+    }
+
+    async function synchroniserDonnees(isBackground = false) {
+        if (!navigator.onLine) {
+            if(!isBackground) showToast("Pas de connexion Internet.", "warning");
+            rafraichirEtatSync();
+            return;
+        }
+
+        const pendingItems = appState.saisies.filter(s => !s.synced);
+        if (!pendingItems.length) {
+            rafraichirEtatSync();
+            return;
+        }
+
+        appState.isSyncing = true;
+        rafraichirEtatSync();
+
+        try {
+            await fetch(SCRIPT_URL, { 
+                method: "POST", 
+                mode: "no-cors", 
+                headers: { "Content-Type": "application/json" }, 
+                body: JSON.stringify(pendingItems) 
+            });
+
+            appState.saisies.forEach(s => s.synced = true);
+            localStorage.setItem('saisies_hors_ligne', JSON.stringify(appState.saisies));
+            
+            const nowStr = new Date().toLocaleDateString() + ' à ' + new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            localStorage.setItem('last_sync_time', nowStr);
+            
+            appState.lastError = null;
+            localStorage.removeItem('last_sync_error');
+
+            if(!isBackground) showToast("Synchronisation réussie !", "success");
+        } catch (e) {
+            const errTxt = "Échec d'envoi réseau";
+            appState.lastError = errTxt;
+            localStorage.setItem('last_sync_error', errTxt);
+            if(!isBackground) showToast(errTxt, "error");
+        } finally {
+            appState.isSyncing = false;
+            rafraichirEtatSync();
+            if(document.getElementById('tab-dashboard').classList.contains('active')) rafraichirDashboard();
+        }
+    }
+
+    function switchTab(tabId, btn) {
+        document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.nav-button').forEach(el => el.classList.remove('active'));
+        
+        document.getElementById(tabId).classList.add('active');
+        btn.classList.add('active');
+        
+        if (tabId === 'tab-dashboard') {
+            initDashboardFilters();
+            rafraichirDashboard();
+        }
+        if (tabId === 'tab-sync') rafraichirEtatSync();
+        
+        window.scrollTo(0, 0);
+    }
+
+    function capturerRapport() {
+        const { start, end } = getDateRange();
+        let titleDate = start === end ? start : `Du ${start} au ${end}`;
+        const cont = document.getElementById('capture-container');
+        cont.innerHTML = `<div style="font-family:sans-serif; padding:20px;">
+            <h1 style="color:#14532d;text-align:center;font-size:1.5rem;">🌿 CANOPY MADAGASCAR</h1>
+            <h3 style="text-align:center;font-size:1rem;margin-bottom:20px;">Bilan Période : ${titleDate}</h3>
+            ${document.getElementById('tab-dashboard').innerHTML.replace(/<button.*?>.*?<\/button>/g, '').replace(/<select.*?>.*?<\/select>/g, '').replace(/<input.*?>/g, '')}
+        </div>`;
+        html2canvas(cont).then(canvas => {
+            const link = document.createElement('a');
+            link.download = `Canopy_Bilan_${start}.png`;
+            link.href = canvas.toDataURL("image/png"); link.click();
+            cont.innerHTML = '';
+        });
+    }
+
+    window.addEventListener('online', () => {
+        rafraichirEtatSync();
+        chargerReferentiels();
+        synchroniserDonnees(true);
+    });
+    
+    window.addEventListener('offline', () => {
+        rafraichirEtatSync();
+    });
+
+    // Enregistrement du Service Worker : permet de charger l'application
+    // (page, styles, icônes) même sans connexion internet.
+    // Les données (chefs d'équipe, tâches, saisies) restent gérées via
+    // localStorage comme auparavant ; ceci ne concerne que le "coffrage" de l'app.
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('sw.js').catch(() => {
+                // Si l'enregistrement échoue (ex: ouverture en local sans serveur),
+                // l'application continue de fonctionner normalement en ligne.
+            });
+        });
+    }
+</script>
+</body>
+</html>
