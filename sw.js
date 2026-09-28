@@ -1,3 +1,5 @@
+// Service Worker - Hors connex
+
 const CACHE_NAME = 'canopy-shell-v1';
 
 const CORE_ASSETS = [
